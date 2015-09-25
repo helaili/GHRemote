@@ -12,26 +12,6 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$stat
       $location.path('/');
     }
 
-    $scope.signup = function (isValid) {
-      $scope.error = null;
-
-      if (!isValid) {
-        $scope.$broadcast('show-errors-check-validity', 'userForm');
-
-        return false;
-      }
-
-      $http.post('/api/auth/signup', $scope.credentials).success(function (response) {
-        // If successful we assign the response to the global user model
-        $scope.authentication.user = response;
-
-        // And redirect to the previous or home page
-        $state.go($state.previous.state.name || 'home', $state.previous.params);
-      }).error(function (response) {
-        $scope.error = response.message;
-      });
-    };
-
     $scope.signin = function (isValid) {
       $scope.error = null;
 
