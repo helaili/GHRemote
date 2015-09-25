@@ -1,0 +1,3 @@
+- Remember to set the right IP address in config/env/development.js
+- Change the callback url accordingly in GitHub's developer application
+- GITHUB_ID and GITHUB_SECRET must be set as env variables 
