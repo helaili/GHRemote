@@ -48,7 +48,10 @@ module.exports = {
   github: {
     clientID: process.env.GITHUB_ID || 'APP_ID',
     clientSecret: process.env.GITHUB_SECRET || 'APP_SECRET',
-    callbackURL: 'http://172.20.10.2:3000/api/auth/github/callback'
+    callbackURL: 'http://172.20.10.2:3000/api/auth/github/callback',
+    authorizationURL: 'https://octoalaindemo/api/v3/login/oauth/authorize',
+    tokenURL: 'https://octoalaindemo/api/v3/login/oauth/access_token'
+
   },
   paypal: {
     clientID: process.env.PAYPAL_ID || 'CLIENT_ID',

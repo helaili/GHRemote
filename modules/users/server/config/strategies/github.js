@@ -13,6 +13,8 @@ module.exports = function (config) {
       clientID: config.github.clientID,
       clientSecret: config.github.clientSecret,
       callbackURL: config.github.callbackURL,
+      authorizationURL: config.github.authorizationURL,
+      tokenURL: config.github.tokenURL,
       passReqToCallback: true
     },
     function (req, accessToken, refreshToken, profile, done) {
