@@ -2,6 +2,8 @@
 
 var defaultEnvConfig = require('./default');
 
+//Work with self-signed SSL Certificate
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
 module.exports = {
   db: {
@@ -48,10 +50,10 @@ module.exports = {
   github: {
     clientID: process.env.GITHUB_ID || 'APP_ID',
     clientSecret: process.env.GITHUB_SECRET || 'APP_SECRET',
-    callbackURL: 'http://172.20.10.2:3000/api/auth/github/callback',
-    authorizationURL: 'https://octoalaindemo/api/v3/login/oauth/authorize',
-    tokenURL: 'https://octoalaindemo/api/v3/login/oauth/access_token'
-
+    callbackURL: 'http://192.168.231.1:3000/api/auth/github/callback',
+    authorizationURL: 'https://octoalaindemo/login/oauth/authorize',
+    tokenURL: 'https://octoalaindemo/login/oauth/access_token',
+    userProfileURL : 'https://octoalaindemo/api/v3/user'
   },
   paypal: {
     clientID: process.env.PAYPAL_ID || 'CLIENT_ID',
