@@ -53,7 +53,9 @@ module.exports = {
     callbackURL: 'http://192.168.231.1:3000/api/auth/github/callback',
     authorizationURL: 'https://octoalaindemo/login/oauth/authorize',
     tokenURL: 'https://octoalaindemo/login/oauth/access_token',
-    userProfileURL : 'https://octoalaindemo/api/v3/user'
+    userProfileURL : 'https://octoalaindemo/api/v3/user',
+    scope : ['user', 'repo', 'notifications', 'admin:org'],
+		githubHost: 'octoalaindemo'
   },
   paypal: {
     clientID: process.env.PAYPAL_ID || 'CLIENT_ID',

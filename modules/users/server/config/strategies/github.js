@@ -15,6 +15,7 @@ module.exports = function (config) {
       callbackURL: config.github.callbackURL,
       authorizationURL: config.github.authorizationURL,
       tokenURL: config.github.tokenURL,
+      scope: config.github.scope,
       userProfileURL: config.github.userProfileURL,
       passReqToCallback: true
     },
