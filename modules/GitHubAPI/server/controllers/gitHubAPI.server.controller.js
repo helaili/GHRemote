@@ -18,12 +18,12 @@ var path = require('path'),
 exports.call = function (req, res) {
   var options = {
     'host': config.github.githubHost,
-    'path': req.body.endpoint + '?access_token=' + req.user.providerData.accessToken,
+    'path': req.body.endpoint,
     'method': 'GET',
     'rejectUnauthorized' : false,
     'headers' : {
       'Authorization' : 'token ' + req.user.providerData.accessToken,
-      'Accept': 'application/vnd.github.v3+json'
+      'Accept': 'application/vnd.github.v3.full+json'
     }
   };
 

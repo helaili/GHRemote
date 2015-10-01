@@ -10,10 +10,8 @@ angular.module('gitHubAPI').controller('GitHubAPIController', ['$scope', '$state
     $scope.call = function (isValid) {
       $scope.error = null;
 
-      console.log("cooool");
       if (!isValid) {
         $scope.$broadcast('show-errors-check-validity', 'gitHubAPIForm');
-
         return false;
       }
 
@@ -24,7 +22,6 @@ angular.module('gitHubAPI').controller('GitHubAPIController', ['$scope', '$state
 
       gitHubAPIServices.$call(function (response) {
         $scope.callResult = JSON.parse(response.callResult);
-        console.log($scope.callResult);
       }, function (errorResponse) {
         $scope.error = errorResponse.data.message;
       });

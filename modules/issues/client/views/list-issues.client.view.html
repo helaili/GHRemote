@@ -1,20 +1,29 @@
 <section ng-controller="IssuesController" ng-init="find()">
   <div class="page-header">
-    <h1>Issues</h1>
+    <h1>My Issues</h1>
   </div>
   <div class="list-group">
-    <a ng-repeat="issue in issues" ui-sref="issues.view({issueId: issue._id})" class="list-group-item">
+    <a ng-repeat="issue in issues" ui-sref="issues.view({issueId: issue.id})" class="list-group-item">
+      <span class="list-group-item-heading">
+        <h4>{{issue.title}}
+          <span ng-if="issueStatus.created[issue.id]" class=" glyphicon glyphicon-pencil pull-right" aria-hidden="true">&nbsp;</span>
+          <span ng-if="issueStatus.assigned[issue.id]" class=" glyphicon glyphicon-user pull-right" aria-hidden="true">&nbsp;</span>
+          <span ng-if="issueStatus.mentioned[issue.id]" class=" glyphicon glyphicon-bullhorn pull-right" aria-hidden="true">&nbsp;</span>
+        </h4>
+
+      </span>
       <small class="list-group-item-text">
-        Posted on
-        <span ng-bind="issue.created | date:'mediumDate'"></span>
-        by
-        <span ng-bind="issue.user.displayName"></span>
+        Posted on <span ng-bind="issue.created_at | date:'mediumDate'"></span>
+        by <span ng-bind="issue.user.login"></span>, last updated on
+        <span ng-bind="issue.updated_at | date:'mediumDate'"></span>.
+        <span ng-if="issue.assignee">
+            Assigned to <span ng-bind="issue.assignee.login"></span>
+        </span>
+
       </small>
-      <h4 class="list-group-item-heading" ng-bind="issue.title"></h4>
       <p class="list-group-item-text" ng-bind="issue.content"></p>
     </a>
-  </div>
-  <div class="alert alert-warning text-center" ng-if="issues.$resolved && !issues.length">
+  </div>  <div class="alert alert-warning text-center" ng-if="issues.$resolved && !issues.length">
     No issues yet, why don't you <a ui-sref="issues.create">create one</a>?
   </div>
 </section>

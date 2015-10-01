@@ -6,7 +6,12 @@
 var path = require('path'),
   mongoose = require('mongoose'),
   Issue = mongoose.model('Issue'),
+  url = require('url'),
+	https = require('https'),
+  config = require(path.resolve('./config/config')),
   errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller'));
+
+
 
 /**
  * Create a issue
@@ -70,19 +75,53 @@ exports.delete = function (req, res) {
   });
 };
 
+function getIssues(req, filter, cb) {
+
+
+};
+
 /**
  * List of Issues
  */
 exports.list = function (req, res) {
-  Issue.find().sort('-created').populate('user', 'displayName').exec(function (err, issues) {
-    if (err) {
-      return res.status(400).send({
-        message: errorHandler.getErrorMessage(err)
-      });
-    } else {
-      res.json(issues);
+  var url_parts = url.parse(req.url, true);
+  var query = url_parts.query;
+
+
+
+  var options = {
+    'host': config.github.githubHost,
+    'path': '/api/v3/issues?filter=' + query.filter,
+    'method': 'GET',
+    'rejectUnauthorized' : false,
+    'headers' : {
+      'Authorization' : 'token ' + req.user.providerData.accessToken,
+      'Accept': 'application/vnd.github.v3+json'
     }
+  };
+
+  var restClient = https;
+  var apiResBody = '';
+
+
+  var request = restClient.request(options, function(apiRes) {
+    apiRes.setEncoding('utf8');
+
+    apiRes.on('data', function (chunk) {
+      apiResBody += chunk;
+    });
+
+    apiRes.on('error', function (chunk) {
+
+    });
+
+    apiRes.on('end',function() {
+      res.json(JSON.parse(apiResBody));
+    });
   });
+
+  request.end();
+
 };
 
 /**
