@@ -5,8 +5,6 @@
         <input type="radio" value="{{$index}}" ng-model="selectedFilter" ng-value="$index" >{{filter.label}}
       </label>
     </div>
-
-
   </div>
   <div class="list-group">
     <a ng-repeat="issue in issues" ui-sref="issues.view({issueId: issue.id})" class="list-group-item">

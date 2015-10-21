@@ -6,17 +6,17 @@ angular.module('issues').controller('IssuesController', ['$scope', '$stateParams
     $scope.authentication = Authentication;
     $scope.selectedFilter = 0;
     $scope.filters = [
-      {'label' : 'My issues'},
-      {'label' : 'Created'},
-      {'label' : 'Assigned'},
-      {'label' : 'Mentioned'}
+      {'label' : 'My issues', type : 'myIssues'},
+      {'label' : 'Created', type : 'created'},
+      {'label' : 'Assigned', type : 'assigned'},
+      {'label' : 'Mentioned', type : 'mentioned'}
     ];
 
 
     $scope.selectFilter = function(filterId) {
         $scope.selectedFilter = filterId;
-        console.log('change');
-    }
+        $scope.find($scope.filters[filterId]);
+    };
 
 
 
@@ -104,7 +104,17 @@ angular.module('issues').controller('IssuesController', ['$scope', '$stateParams
       }
     }
 
-    // Find a list of Issues
+    // Find one single list of Issues
+    $scope.findIssues = function(filter) {
+      Issues.query({
+        'filter': filter
+      }, function(issues) {
+        mergeIssues(issues, filter);
+      });
+    };
+
+
+    // Find a list of list of Issues
     $scope.find = function (filter) {
       $scope.issueIds = [];
       $scope.issues = [];
@@ -114,24 +124,19 @@ angular.module('issues').controller('IssuesController', ['$scope', '$stateParams
         'assigned' : {}
       };
 
+      var filterIds = [];
 
-      Issues.query({
-        filter: 'created'
-      }, function(issues) {
-        mergeIssues(issues, 'created');
-      });
+      if(!filter || filter.type === 'myIssues') {
+        filterIds = ['created', 'assigned', 'mentioned'];
+      } else {
+        filterIds.push(filter.type);
+      }
 
-      Issues.query({
-        filter: 'assigned'
-      }, function(issues) {
-        mergeIssues(issues, 'assigned');
-      });
+      console.log(filterIds);
 
-      Issues.query({
-        filter: 'mentioned'
-      }, function(issues) {
-        mergeIssues(issues, 'mentioned');
-      });
+      for(var counter = 0; counter < filterIds.length; counter++) {
+        $scope.findIssues(filterIds[counter]);
+      }
     };
 
     // Find existing Issue
