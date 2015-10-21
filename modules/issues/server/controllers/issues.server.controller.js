@@ -75,11 +75,6 @@ exports.delete = function (req, res) {
   });
 };
 
-function getIssues(req, filter, cb) {
-
-
-};
-
 /**
  * List of Issues
  */

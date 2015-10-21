@@ -1,14 +1,22 @@
 <section ng-controller="IssuesController" ng-init="find()">
   <div class="page-header">
-    <h1>My Issues</h1>
+    <div class="btn-group" data-toggle="buttons">
+      <label data-ng-repeat="filter in filters" class="btn" ng-class="{'btn-primary': $index==selectedFilter, 'btn-default': $index!=selectedFilter}" ng-click="selectFilter($index)">
+        <input type="radio" value="{{$index}}" ng-model="selectedFilter" ng-value="$index" >{{filter.label}}
+      </label>
+    </div>
+
+
   </div>
   <div class="list-group">
     <a ng-repeat="issue in issues" ui-sref="issues.view({issueId: issue.id})" class="list-group-item">
       <span class="list-group-item-heading">
         <h4>{{issue.title}}
-          <span ng-if="issueStatus.created[issue.id]" class=" glyphicon glyphicon-pencil pull-right" aria-hidden="true">&nbsp;</span>
-          <span ng-if="issueStatus.assigned[issue.id]" class=" glyphicon glyphicon-user pull-right" aria-hidden="true">&nbsp;</span>
-          <span ng-if="issueStatus.mentioned[issue.id]" class=" glyphicon glyphicon-bullhorn pull-right" aria-hidden="true">&nbsp;</span>
+          <button class="btn btn-default glyphicon glyphicon glyphicon-volume-off pull-right" type="submit"></button>
+          <button class="btn btn-default glyphicon glyphicon glyphicon-star pull-right" type="submit"></button>
+          <span ng-if="issueStatus.created[issue.id]" class=" glyphicon glyphicon-pencil pull-right text-muted" aria-hidden="true">&nbsp;</span>
+          <span ng-if="issueStatus.assigned[issue.id]" class=" glyphicon glyphicon-user pull-right text-muted" aria-hidden="true">&nbsp;</span>
+          <span ng-if="issueStatus.mentioned[issue.id]" class=" glyphicon glyphicon-bullhorn pull-right text-muted" aria-hidden="true">&nbsp;</span>
         </h4>
 
       </span>
