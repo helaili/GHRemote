@@ -14,16 +14,16 @@ angular.module('issues').config(['$stateProvider',
         url: '',
         templateUrl: 'modules/issues/client/views/list-issues.client.view.html'
       })
+      .state('issues.view', {
+        url: '/read/{repositoryOwner}/{repositoryName}/{issueNumber}',
+        templateUrl: 'modules/issues/client/views/view-issue.client.view.html'
+      })
       .state('issues.create', {
         url: '/create',
         templateUrl: 'modules/issues/client/views/create-issue.client.view.html',
         data: {
           roles: ['user', 'admin']
         }
-      })
-      .state('issues.view', {
-        url: '/:issueId',
-        templateUrl: 'modules/issues/client/views/view-issue.client.view.html'
       })
       .state('issues.edit', {
         url: '/:issueId/edit',

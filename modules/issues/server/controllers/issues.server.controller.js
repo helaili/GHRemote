@@ -6,8 +6,8 @@
 var path = require('path'),
   mongoose = require('mongoose'),
   Issue = mongoose.model('Issue'),
-  url = require('url'),
-	https = require('https'),
+  _url = require('url'),
+	_https = require('https'),
   config = require(path.resolve('./config/config')),
   errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller'));
 
@@ -35,7 +35,50 @@ exports.create = function (req, res) {
  * Show the current issue
  */
 exports.read = function (req, res) {
-  res.json(req.issue);
+  console.log('here', req.body);
+  var body = JSON.parse(JSON.stringify(req.body));
+
+
+  if(!body) {
+    return res.send(400, {
+				message: 'No body in http request'
+    });
+  }
+
+
+  var options = {
+    'host': config.github.githubHost,
+    'path': '/api/v3/repos/' + body.repositoryOwner + '/' +  body.repositoryName + '/issues/' + body.issueId,
+    'method': 'GET',
+    'rejectUnauthorized' : false,
+    'headers' : {
+      'Authorization' : 'token ' + req.user.providerData.accessToken,
+      'Accept': 'application/vnd.github.v3+json'
+    }
+  };
+
+  var restClient = _https;
+  var apiResBody = '';
+
+  var request = restClient.request(options, function(apiRes) {
+    apiRes.setEncoding('utf8');
+
+    apiRes.on('data', function (chunk) {
+      apiResBody += chunk;
+    });
+
+    apiRes.on('error', function (chunk) {
+      return res.send(400, {
+  				message: 'Error retrieving issue at URL ' + req.body.issueURL
+      });
+    });
+
+    apiRes.on('end',function() {
+      res.json(JSON.parse(apiResBody));
+    });
+  });
+
+  request.end();
 };
 
 /**
@@ -79,10 +122,8 @@ exports.delete = function (req, res) {
  * List of Issues
  */
 exports.list = function (req, res) {
-  var url_parts = url.parse(req.url, true);
-  var query = url_parts.query;
-
-
+  var urlParts = _url.parse(req.url, true);
+  var query = urlParts.query;
 
   var options = {
     'host': config.github.githubHost,
@@ -95,7 +136,7 @@ exports.list = function (req, res) {
     }
   };
 
-  var restClient = https;
+  var restClient = _https;
   var apiResBody = '';
 
 
@@ -124,21 +165,4 @@ exports.list = function (req, res) {
  */
 exports.issueByID = function (req, res, next, id) {
 
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    return res.status(400).send({
-      message: 'Issue is invalid'
-    });
-  }
-
-  Issue.findById(id).populate('user', 'displayName').exec(function (err, issue) {
-    if (err) {
-      return next(err);
-    } else if (!issue) {
-      return res.status(404).send({
-        message: 'No issue with that identifier has been found'
-      });
-    }
-    req.issue = issue;
-    next();
-  });
 };

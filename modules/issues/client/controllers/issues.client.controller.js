@@ -85,23 +85,19 @@ angular.module('issues').controller('IssuesController', ['$scope', '$stateParams
     };
 
     function mergeIssues(newIssues, status) {
-      if(!$scope.issues) {
-        $scope.issues = newIssues;
-      } else {
-        //Inserting new issues
-        for(var counter = 0; counter < newIssues.length; counter++){
-          $scope.issueStatus[status][newIssues[counter].id] = true;
-
-          if($scope.issueIds.indexOf(newIssues[counter].id) < 0) {
-            $scope.issueIds.push(newIssues[counter].id);
-            $scope.issues.push(newIssues[counter]);
-          }
+      //Inserting new issues
+      for(var counter = 0; counter < newIssues.length; counter++){
+        $scope.issueStatus[status][newIssues[counter].id] = true;
+        
+        if($scope.issueIds.indexOf(newIssues[counter].id) < 0) {
+          $scope.issueIds.push(newIssues[counter].id);
+          $scope.issues.push(newIssues[counter]);
         }
-
-        $scope.issues.sort(function(a, b) {
-          return Date(a.updated_at) - Date(b.updated_at);
-        });
       }
+
+      $scope.issues.sort(function(a, b) {
+        return Date(a.updated_at) - Date(b.updated_at);
+      });
     }
 
     // Find one single list of Issues
@@ -132,17 +128,22 @@ angular.module('issues').controller('IssuesController', ['$scope', '$stateParams
         filterIds.push(filter.type);
       }
 
-      console.log(filterIds);
-
       for(var counter = 0; counter < filterIds.length; counter++) {
         $scope.findIssues(filterIds[counter]);
       }
     };
 
+
     // Find existing Issue
-    $scope.findOne = function () {
-      $scope.issue = Issues.get({
-        issueId: $stateParams.issueId
+    $scope.getIssue = function () {
+      console.log('yyyyyyyiiiiiiissssss', $stateParams.repositoryOwner, $stateParams.repositoryName, $stateParams.issueNumber );
+
+      $scope.issue = Issues.read({
+        repositoryName : $stateParams.repositoryName,
+        repositoryOwner : $stateParams.repositoryOwner,
+        issueId : $stateParams.issueNumber
+      }, function(response) {
+        //console.log(response);
       });
     };
   }

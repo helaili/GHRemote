@@ -8,6 +8,10 @@ angular.module('issues').factory('Issues', ['$resource',
     }, {
       update: {
         method: 'PUT'
+      },
+      read : {
+        method : 'POST',
+      	url : 'api/issues/read'
       }
     });
   }

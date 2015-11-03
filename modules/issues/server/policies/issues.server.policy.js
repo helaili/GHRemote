@@ -27,6 +27,9 @@ exports.invokeRolesPolicies = function () {
       resources: '/api/issues',
       permissions: ['get', 'post']
     }, {
+      resources: '/api/issues/read',
+      permissions: ['post']
+    }, {
       resources: '/api/issues/:issueId',
       permissions: ['get']
     }]

@@ -7,7 +7,7 @@
     </div>
   </div>
   <div class="list-group">
-    <a ng-repeat="issue in issues" ui-sref="issues.view({issueId: issue.id})" class="list-group-item">
+    <a ng-repeat="issue in issues" ui-sref="issues.view({repositoryName : issue.repository.name, repositoryOwner : issue.repository.owner.login, issueNumber : issue.number})" class="list-group-item">
       <span class="list-group-item-heading">
         <h4>{{issue.title}}
           <button class="btn btn-default glyphicon glyphicon glyphicon-volume-off pull-right" type="submit"></button>
@@ -20,6 +20,7 @@
       </span>
       <small class="list-group-item-text">
         Posted on <span ng-bind="issue.created_at | date:'mediumDate'"></span>
+        in <span ng-bind="issue.repository.full_name"></span>,
         by <span ng-bind="issue.user.login"></span>, last updated on
         <span ng-bind="issue.updated_at | date:'mediumDate'"></span>.
         <span ng-if="issue.assignee">
