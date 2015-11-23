@@ -88,7 +88,7 @@ angular.module('issues').controller('IssuesController', ['$scope', '$stateParams
       //Inserting new issues
       for(var counter = 0; counter < newIssues.length; counter++){
         $scope.issueStatus[status][newIssues[counter].id] = true;
-        
+
         if($scope.issueIds.indexOf(newIssues[counter].id) < 0) {
           $scope.issueIds.push(newIssues[counter].id);
           $scope.issues.push(newIssues[counter]);
@@ -136,14 +136,15 @@ angular.module('issues').controller('IssuesController', ['$scope', '$stateParams
 
     // Find existing Issue
     $scope.getIssue = function () {
-      console.log('yyyyyyyiiiiiiissssss', $stateParams.repositoryOwner, $stateParams.repositoryName, $stateParams.issueNumber );
+      $scope.repositoryName = $stateParams.repositoryName;
+      $scope.repositoryOwner = $stateParams.repositoryOwner;
 
       $scope.issue = Issues.read({
         repositoryName : $stateParams.repositoryName,
         repositoryOwner : $stateParams.repositoryOwner,
         issueId : $stateParams.issueNumber
       }, function(response) {
-        //console.log(response);
+        console.log(response);
       });
     };
   }

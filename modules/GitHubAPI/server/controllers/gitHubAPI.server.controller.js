@@ -51,9 +51,14 @@ exports.call = function (req, res) {
   request.end();
 };
 
-/**
- * List of Articles
- */
 exports.list = function (req, res) {
   res.json({'message' : 'Awwww Yisss'});
+};
+
+exports.onDeployement = function (req, res) {
+  res.json({'message' : 'Awwww Yisss, some deployement'});
+};
+
+exports.onDeployementStatus = function (req, res) {
+  res.json({'message' : 'Awwww Yisss, some deployement status'});
 };

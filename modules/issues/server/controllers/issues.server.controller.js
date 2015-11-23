@@ -35,14 +35,21 @@ exports.create = function (req, res) {
  * Show the current issue
  */
 exports.read = function (req, res) {
-  console.log('here', req.body);
   var body = JSON.parse(JSON.stringify(req.body));
-
+  var requiredParams = ['repositoryOwner', 'repositoryName', 'issueId'];
 
   if(!body) {
     return res.send(400, {
 				message: 'No body in http request'
     });
+  }
+
+  for(var reqParamCounter = 0; reqParamCounter < requiredParams.length; reqParamCounter++) {
+    if(!body[requiredParams[reqParamCounter]]) {
+      return res.send(400, {
+  				message: 'Missing post data : ' + requiredParams[reqParamCounter]
+      });
+    }
   }
 
 

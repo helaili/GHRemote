@@ -29,7 +29,13 @@ exports.invokeRolesPolicies = function () {
     allows: [{
       resources: '/api/gitHubAPI',
       permissions: ['get']
-    }]
+     }, {
+      resources: '/api/gitHubAPI/deployement',
+      permissions: ['post']
+     }, {
+      resources: '/api/gitHubAPI/deployementStatus',
+      permissions: ['post']
+     }]
   }]);
 };
 

@@ -12,10 +12,13 @@
   </div>
   <small>
     <em class="text-muted">
-      Posted on
-      <span ng-bind="issue.created | date:'mediumDate'"></span>
-      by
-      <span ng-bind="issue.user.displayName"></span>
+      Posted on <span ng-bind="issue.created_at | date:'mediumDate'"></span>
+      in <span ng-bind="repositoryOwner"></span>/<span ng-bind="repositoryName"></span>
+      by <span ng-bind="issue.user.login"></span>, last updated on
+      <span ng-bind="issue.updated_at | date:'mediumDate'"></span>.
+      <span ng-if="issue.assignee">
+          Assigned to <span ng-bind="issue.assignee.login"></span>
+      </span>
     </em>
   </small>
   <p class="lead" ng-bind="issue.content"></p>
