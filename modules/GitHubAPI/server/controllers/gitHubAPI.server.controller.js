@@ -8,8 +8,7 @@ var path = require('path'),
   Push = mongoose.model('Push'),
 	url = require('url'),
 	https = require('https'),
-  http = require('http'),
-	querystring = require('querystring'),
+  querystring = require('querystring'),
   config = require(path.resolve('./config/config')),
   errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller'));
 
