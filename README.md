@@ -1,6 +1,7 @@
 - Remember to set the right IP address in config/env/development.js
 - Change the callback url accordingly in GitHub's developer application
-- GITHUB_ID and GITHUB_SECRET must be set as env variables
+- Create an OAUTH app as well as a Personal Access Token
+- GITHUB_ACCESS_TOKEN, GITHUB_ID and GITHUB_SECRET must be set as env variables
 
 
 http(s)://hostname/api/v3/

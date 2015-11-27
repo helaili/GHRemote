@@ -50,7 +50,7 @@ module.exports = {
   github: {
     clientID: process.env.GITHUB_ID || 'APP_ID',
     clientSecret: process.env.GITHUB_SECRET || 'APP_SECRET',
-    accessToken:  process.env.GITHUB_ACCESS_TOKEN,
+    accessToken:  process.env.GITHUB_ACCESS_TOKEN  || 'ACCESS_TOKEN',
     callbackURL: 'http://192.168.231.1:3000/api/auth/github/callback',
     authorizationURL: 'https://octoalaindemo/login/oauth/authorize',
     tokenURL: 'https://octoalaindemo/login/oauth/access_token',
