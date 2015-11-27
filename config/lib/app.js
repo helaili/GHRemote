@@ -6,6 +6,7 @@
 var config = require('../config'),
   mongoose = require('./mongoose'),
   express = require('./express'),
+  winston = require('winston'),
   chalk = require('chalk');
 
 // Initialize Models
@@ -47,6 +48,9 @@ module.exports.start = function start(callback) {
         console.log(chalk.green('HTTPs:\t\t\t\ton'));
       }
       console.log('--');
+
+      //winston.add(winston.transports.Console, { level: 'error' });
+      winston.add(winston.transports.File, {filename: 'ghremote.log', level: 'debug'});
 
       if (callback) callback(app, db, config);
     });

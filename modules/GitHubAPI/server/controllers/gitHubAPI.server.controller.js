@@ -10,6 +10,7 @@ var path = require('path'),
 	https = require('https'),
   querystring = require('querystring'),
   config = require(path.resolve('./config/config')),
+  logger = require('winston'),
   errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller'));
 
 /**
@@ -52,8 +53,7 @@ exports.call = function (req, res) {
 };
 
 exports.list = function (req, res) {
-  console.log();
-
+  logger.debug('In gitHubAPI.server.controller.list');
 
   res.json({'message' : 'Awwww Yisss'});
 };
@@ -67,28 +67,25 @@ exports.deployementStatus = function (req, res) {
 };
 
 function setImpersonationStatus(push, commitIndex, options, postData) {
-  console.log(options);
-
   var statusAPIRequest = https.request(options, function(statusAPIResponse) {
-    console.log('STATUS: ' + statusAPIResponse.statusCode);
-    console.log('HEADERS: ' + JSON.stringify(statusAPIResponse.headers));
+    logger.debug('STATUS: ' + statusAPIResponse.statusCode);
+    logger.debug('HEADERS: ' + JSON.stringify(statusAPIResponse.headers));
+
     statusAPIResponse.setEncoding('utf8');
 
     statusAPIResponse.on('data', function (chunk) {
-      console.log('BODY: ' + chunk);
+      logger.debug('BODY: ' + chunk);
     });
 
     statusAPIResponse.on('end', function() {
-      console.log('No more data in response.');
-
       // Weird but otherwhise the updated field was 'field' i.e. the variable name as opposed to the variable value.
       var field = {};
       field['payload.commits.' + 0 + '.statusReported'] = true;
       mongoose.connection.collections.pushes.update({'_id' : push._id}, {'$set' : field}, function (err, doc) {
         if(err) {
-          console.log(err);
+          logger.error(err);
         } else {
-          console.log('success');
+          logger.debug('Persisted the commit report event', doc);
         }
       });
     });
@@ -112,11 +109,11 @@ exports.pushValidator = function (req, res) {
   var push = new Push();
   push.payload = req.body;
 
-  console.log('### BODY ###');
-  console.log(push.payload);
+  logger.debug('Recieving a push event', push.payload);
 
   push.save(function(err) {
     if (err) {
+      logger.error(err);
       return res.send(400, {'message' : err });
     } else {
       for(var commitCounter = 0; commitCounter < commits.length; commitCounter++) {
