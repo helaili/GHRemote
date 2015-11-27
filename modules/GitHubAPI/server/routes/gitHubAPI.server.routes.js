@@ -8,11 +8,13 @@ var gitHubAPIPolicy = require('../policies/gitHubAPI.server.policy'),
 
 module.exports = function (app) {
   app.route('/api/gitHubAPI/deployement').all(gitHubAPIPolicy.isAllowed)
-    .post(gitHubAPI.onDeployement);
+    .post(gitHubAPI.deployement);
 
   app.route('/api/gitHubAPI/deployementStatus').all(gitHubAPIPolicy.isAllowed)
-    .post(gitHubAPI.onDeployementStatus);
+    .post(gitHubAPI.deployementStatus);
 
+  app.route('/api/gitHubAPI/pushValidator').all(gitHubAPIPolicy.isAllowed)
+    .post(gitHubAPI.pushValidator);
 
   app.route('/api/gitHubAPI').all(gitHubAPIPolicy.isAllowed)
     .get(gitHubAPI.list)

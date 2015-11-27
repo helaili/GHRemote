@@ -5,7 +5,8 @@
  */
 var path = require('path'),
   mongoose = require('mongoose'),
-  url = require('url'),
+  Push = mongoose.model('Push'),
+	url = require('url'),
 	https = require('https'),
   http = require('http'),
 	querystring = require('querystring'),
@@ -52,13 +53,109 @@ exports.call = function (req, res) {
 };
 
 exports.list = function (req, res) {
+  console.log();
+
+
   res.json({'message' : 'Awwww Yisss'});
 };
 
-exports.onDeployement = function (req, res) {
+exports.deployement = function (req, res) {
   res.json({'message' : 'Awwww Yisss, some deployement'});
 };
 
-exports.onDeployementStatus = function (req, res) {
+exports.deployementStatus = function (req, res) {
   res.json({'message' : 'Awwww Yisss, some deployement status'});
+};
+
+function setImpersonationStatus(push, commitIndex, options, postData) {
+  console.log(options);
+
+  var statusAPIRequest = https.request(options, function(statusAPIResponse) {
+    console.log('STATUS: ' + statusAPIResponse.statusCode);
+    console.log('HEADERS: ' + JSON.stringify(statusAPIResponse.headers));
+    statusAPIResponse.setEncoding('utf8');
+
+    statusAPIResponse.on('data', function (chunk) {
+      console.log('BODY: ' + chunk);
+    });
+
+    statusAPIResponse.on('end', function() {
+      console.log('No more data in response.');
+
+      // Weird but otherwhise the updated field was 'field' i.e. the variable name as opposed to the variable value.
+      var field = {};
+      field['payload.commits.' + 0 + '.statusReported'] = true;
+      mongoose.connection.collections.pushes.update({'_id' : push._id}, {'$set' : field}, function (err, doc) {
+        if(err) {
+          console.log(err);
+        } else {
+          console.log('success');
+        }
+      });
+    });
+  });
+
+  statusAPIRequest.on('error', function(e) {
+    console.log('problem with request: ' + e.message);
+  });
+
+  // write data to request body
+  statusAPIRequest.write(JSON.stringify(postData));
+  statusAPIRequest.end();
+}
+
+exports.pushValidator = function (req, res) {
+  var pusher = req.body.pusher;
+  var commits = req.body.commits;
+
+  var statusAPIURL = url.parse(req.body.repository.statuses_url);
+
+  var push = new Push();
+  push.payload = req.body;
+
+  console.log('### BODY ###');
+  console.log(push.payload);
+
+  push.save(function(err) {
+    if (err) {
+      return res.send(400, {'message' : err });
+    } else {
+      for(var commitCounter = 0; commitCounter < commits.length; commitCounter++) {
+        var options = {
+          'host': statusAPIURL.host,
+          'path': statusAPIURL.path.replace('%7Bsha%7D', commits[commitCounter].id),
+          'method': 'POST',
+          'headers' : {
+            'Authorization' : 'token ' + config.github.accessToken,
+            'Accept': 'application/vnd.github.v3+json'
+          }
+        };
+
+        var postData = {};
+
+        if(commits[commitCounter].committer.email !== pusher.email) {
+          postData = {
+            "state": "failure",
+            "target_url": "https://example.com/build/status",
+            "description": "Spoofing alert",
+            "context": "security/impersonation"
+          };
+        } else {
+          postData = {
+            "state": "success",
+            "target_url": "https://example.com/build/status",
+            "description": "Clean commit",
+            "context": "security/impersonation"
+          };
+        }
+
+        setImpersonationStatus(push, commitCounter, options, postData);
+
+      }
+
+      return res.status(200).send({'message' : 'OK' });
+
+    }
+  });
+
 };

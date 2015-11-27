@@ -35,12 +35,15 @@ exports.invokeRolesPolicies = function () {
      }, {
       resources: '/api/gitHubAPI/deployementStatus',
       permissions: ['post']
+     }, {
+      resources: '/api/gitHubAPI/pushValidator',
+      permissions: ['post']
      }]
   }]);
 };
 
 /**
- * Check If Articles Policy Allows
+ * Check If API Policy Allows
  */
 exports.isAllowed = function (req, res, next) {
   var roles = (req.user) ? req.user.roles : ['guest'];
