@@ -81,7 +81,7 @@ exports.deployementStatus = function (req, res) {
   res.json({'message' : 'Awwww Yisss, some deployement status'});
 };
 
-function setImpersonationStatus(push, commitIndex, options, postData) {
+function setImpersonationCommitStatus(push, commitIndex, options, postData) {
   var statusAPIRequest = https.request(options, function(statusAPIResponse) {
     logger.debug('HTTP Status : ' + statusAPIResponse.statusCode);
     logger.debug('HTTP headers', statusAPIResponse.headers);
@@ -157,7 +157,7 @@ exports.pushValidator = function (req, res) {
           };
         }
 
-        setImpersonationStatus(push, commitCounter, options, postData);
+        setImpersonationCommitStatus(push, commitCounter, options, postData);
 
       }
 
