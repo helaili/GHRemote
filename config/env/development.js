@@ -76,7 +76,7 @@ module.exports = {
   },
   winston: {
     GitHubAPI : {
-      label: 'GitHub API'
+      label: 'GitHub API',
       console : {
         level : 'debug'
       },
