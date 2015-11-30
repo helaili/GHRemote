@@ -74,6 +74,18 @@ module.exports = {
       }
     }
   },
+  winston: {
+    GitHubAPI : {
+      label: 'GitHub API'
+      console : {
+        level : 'debug'
+      },
+      file: {
+        level : 'info',
+        filename: './ghremote.log'
+      }
+    }
+  },
   livereload: true,
   seedDB: process.env.MONGO_SEED || false
 };

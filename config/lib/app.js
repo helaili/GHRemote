@@ -50,7 +50,7 @@ module.exports.start = function start(callback) {
       console.log('--');
 
       //winston.add(winston.transports.Console, { level: 'error' });
-      winston.add(winston.transports.File, {filename: 'ghremote.log', level: 'debug'});
+      //winston.add(winston.transports.File, {filename: 'ghremote.log', level: 'debug'});
 
       if (callback) callback(app, db, config);
     });

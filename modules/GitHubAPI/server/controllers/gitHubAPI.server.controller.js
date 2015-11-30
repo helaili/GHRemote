@@ -10,8 +10,23 @@ var path = require('path'),
 	https = require('https'),
   querystring = require('querystring'),
   config = require(path.resolve('./config/config')),
-  logger = require('winston'),
+  winston = require('winston'),
   errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller'));
+
+winston.loggers.add('GitHubAPI', {
+  console: {
+    level: config.winston.GitHubAPI.console.level,
+    colorize: true,
+    label: config.winston.GitHubAPI.label
+  },
+  file: {
+    level: config.winston.GitHubAPI.file.level,
+    filename: config.winston.GitHubAPI.file.filename,
+    label: config.winston.GitHubAPI.label
+  }
+});
+
+ var logger = winston.loggers.get('GitHubAPI');
 
 /**
  * Create a article
@@ -68,31 +83,28 @@ exports.deployementStatus = function (req, res) {
 
 function setImpersonationStatus(push, commitIndex, options, postData) {
   var statusAPIRequest = https.request(options, function(statusAPIResponse) {
-    logger.debug('STATUS: ' + statusAPIResponse.statusCode);
-    logger.debug('HEADERS: ' + JSON.stringify(statusAPIResponse.headers));
+    logger.debug('HTTP Status : ' + statusAPIResponse.statusCode);
+    logger.debug('HTTP headers', statusAPIResponse.headers);
 
     statusAPIResponse.setEncoding('utf8');
-
-    statusAPIResponse.on('data', function (chunk) {
-      logger.debug('BODY: ' + chunk);
-    });
 
     statusAPIResponse.on('end', function() {
       // Weird but otherwhise the updated field was 'field' i.e. the variable name as opposed to the variable value.
       var field = {};
       field['payload.commits.' + 0 + '.statusReported'] = true;
-      mongoose.connection.collections.pushes.update({'_id' : push._id}, {'$set' : field}, function (err, doc) {
+
+      mongoose.connection.collections.pushes.update({'_id' : push._id}, {'$set' : field}, function (err, res) {
         if(err) {
           logger.error(err);
         } else {
-          logger.debug('Persisted the commit report event', doc);
+          logger.debug('Persisted the commit report event', res.result);
         }
       });
     });
   });
 
   statusAPIRequest.on('error', function(e) {
-    console.log('problem with request: ' + e.message);
+    console.log('problem sending back impersonation commit status : ' + e.message);
   });
 
   // write data to request body
@@ -133,7 +145,7 @@ exports.pushValidator = function (req, res) {
           postData = {
             "state": "failure",
             "target_url": "https://example.com/build/status",
-            "description": "Spoofing alert",
+            "description": "Spoofed commit",
             "context": "security/impersonation"
           };
         } else {
