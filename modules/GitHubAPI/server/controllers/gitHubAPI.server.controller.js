@@ -87,70 +87,78 @@ exports.deployementStatus = function (req, res) {
  * Checking the status of one commit
  ***/
 function setImpersonationCommitStatus(push, options, commitIndex, foundSpoofing) {
-  var postData = {};
+  return new Promise(function(fulfill, reject) {
+    var postData = {};
 
-  if(foundSpoofing) {
-    postData = {
-      "state": "failure",
-      "target_url": "https://example.com/build/status",
-      "description": "Spoofed commit",
-      "context": "security/impersonation"
-    };
-  } else {
-    postData = {
-      "state": "success",
-      "target_url": "https://example.com/build/status",
-      "description": "Clean commit",
-      "context": "security/impersonation"
-    };
-  }
+    if(foundSpoofing) {
+      postData = {
+        "state": "failure",
+        "target_url": "https://example.com/build/status",
+        "description": "Spoofed commit",
+        "context": "security/impersonation"
+      };
+    } else {
+      postData = {
+        "state": "success",
+        "target_url": "https://example.com/build/status",
+        "description": "Clean commit",
+        "context": "security/impersonation"
+      };
+    }
 
-  var statusAPIRequest = https.request(options, function(statusAPIResponse) {
-    logger.debug('gitHubAPI.server.controller.setImpersonationCommitStatus - HTTP target : ' + options.path);
-    logger.debug('gitHubAPI.server.controller.setImpersonationCommitStatus - HTTP status : ' + statusAPIResponse.statusCode);
-    logger.debug('gitHubAPI.server.controller.setImpersonationCommitStatus - HTTP headers', statusAPIResponse.headers);
+    var statusAPIRequest = https.request(options, function(statusAPIResponse) {
+      logger.debug('gitHubAPI.server.controller.setImpersonationCommitStatus - HTTP target : ' + options.path);
+      logger.debug('gitHubAPI.server.controller.setImpersonationCommitStatus - HTTP status : ' + statusAPIResponse.statusCode);
+      logger.debug('gitHubAPI.server.controller.setImpersonationCommitStatus - HTTP headers', statusAPIResponse.headers);
 
-    statusAPIResponse.setEncoding('utf8');
+      statusAPIResponse.setEncoding('utf8');
 
-    statusAPIResponse.on('data', function (chunk) {
-    });
+      statusAPIResponse.on('data', function (chunk) {
 
-    statusAPIResponse.on('end', function() {
-      logger.debug('gitHubAPI.server.controller.setImpersonationCommitStatus - Saving commit', push.payload.commits[commitIndex]);
-      var commit = new Commit(push.payload.commits[commitIndex]);
-      commit.spoofed = foundSpoofing;
-      commit.save(function(err) {
-        if (err) {
-          logger.error('gitHubAPI.server.controller.setImpersonationCommitStatus - Failed saving commit : ' + err);
-        }
       });
 
-      /*
-      // Weird but otherwhise the updated field was 'field' i.e. the variable name as opposed to the variable value.
-      var field = {};
-      field['payload.commits.' + commitIndex + '.spoofedStatusReported'] = true;
-      field['payload.commits.' + commitIndex + '.spoofedComment'] = foundSpoofing;
+      statusAPIResponse.on('end', function() {
+        logger.debug('gitHubAPI.server.controller.setImpersonationCommitStatus - Saving commit', push.payload.commits[commitIndex]);
+        var commit = new Commit(push.payload.commits[commitIndex]);
+        commit.spoofed = foundSpoofing;
+        commit.save(function(err) {
+          if (err) {
+            logger.error('gitHubAPI.server.controller.setImpersonationCommitStatus - Failed saving commit : ' + err);
+          }
 
-      // Updating the commit in the DB so we know the status was reported
-      mongoose.connection.collections.pushes.update({'_id' : push._id}, {'$set' : field}, function (err, res) {
-        if(err) {
-          logger.error(err);
-        } else {
-          logger.debug('gitHubAPI.server.controller.setImpersonationCommitStatus - Persisted the commit report event', res.result);
-        }
+          logger.debug('gitHubAPI.server.controller.setImpersonationCommitStatus - Promise is fulfilled');
+          fulfill(foundSpoofing);
+        });
+
+        /*
+        // Weird but otherwhise the updated field was 'field' i.e. the variable name as opposed to the variable value.
+        var field = {};
+        field['payload.commits.' + commitIndex + '.spoofedStatusReported'] = true;
+        field['payload.commits.' + commitIndex + '.spoofedComment'] = foundSpoofing;
+
+        // Updating the commit in the DB so we know the status was reported
+        mongoose.connection.collections.pushes.update({'_id' : push._id}, {'$set' : field}, function (err, res) {
+          if(err) {
+            logger.error(err);
+          } else {
+            logger.debug('gitHubAPI.server.controller.setImpersonationCommitStatus - Persisted the commit report event', res.result);
+          }
+        });
+        */
+
       });
-      */
+
 
     });
-  });
 
-  statusAPIRequest.on('error', function(e) {
-    logger.error('gitHubAPI.server.controller.setImpersonationCommitStatus - Problem sending back impersonation commit status : ' + e.message);
-  });
+    statusAPIRequest.on('error', function(e) {
+      logger.error('gitHubAPI.server.controller.setImpersonationCommitStatus - Problem sending back impersonation commit status : ' + e.message);
+    });
 
-  // write data to request body
-  statusAPIRequest.write(JSON.stringify(postData));
-  statusAPIRequest.end();
+    // write data to request body
+    statusAPIRequest.write(JSON.stringify(postData));
+    statusAPIRequest.end();
+  });
 }
 
 /***
@@ -207,14 +215,59 @@ function setImpersonationPullRequestStatus(push, foundSpoofing) {
 }
 
 /***
+ * Processing each commit within a Push.
+ * Using promises so the pull request status is not set until after each commit has been processed.
+ ***/
+function processCommits(push) {
+  return new Promise(function(fulfill, reject) {
+    var pusher = push.payload.pusher;
+    var commits = push.payload.commits;
+    var statusAPIURL = url.parse(push.payload.repository.statuses_url);
+
+
+    var foundSpoofing = false;
+    var commitsRemainingToProcess = commits.length;
+
+    // Checking individual commits within this Push event
+    for(var commitCounter = 0; commitCounter < commits.length; commitCounter++) {
+
+      var options = {
+        'host': statusAPIURL.host,
+        'path': statusAPIURL.path.replace('%7Bsha%7D', commits[commitCounter].id),
+        'method': 'POST',
+        'headers' : {
+          'Authorization' : 'token ' + config.github.accessToken,
+          'Accept': 'application/vnd.github.v3+json'
+        }
+      };
+
+      var postData = {};
+
+      //Comparing pusher email with commiter email
+      if(commits[commitCounter].committer.email !== pusher.email) {
+        foundSpoofing = true;
+        setImpersonationCommitStatus(push, options, commitCounter, true).then(commitProcessed(--commitsRemainingToProcess, foundSpoofing, fulfill));
+      } else {
+        setImpersonationCommitStatus(push, options, commitCounter, false).then(commitProcessed(--commitsRemainingToProcess, foundSpoofing, fulfill));
+      }
+    }
+  });
+}
+
+/***
+ * Checking is all commits have been processed before marking the promised as fulfilled.
+ ***/
+function commitProcessed(commitsRemainingToProcess, foundSpoofing, fulfill) {
+  logger.debug('gitHubAPI.server.controller.commitProcessed - Commits remaining to process : ' + commitsRemainingToProcess);
+  if(commitsRemainingToProcess === 0) {
+    fulfill(foundSpoofing);
+  }
+}
+
+/***
  * A Push event was recieved *
  ***/
 exports.pushValidator = function (req, res) {
-  var pusher = req.body.pusher;
-  var commits = req.body.commits;
-
-  var statusAPIURL = url.parse(req.body.repository.statuses_url);
-
   var push = new Push();
   push.payload = req.body;
 
@@ -226,37 +279,11 @@ exports.pushValidator = function (req, res) {
       logger.error(err);
       return res.send(400, {'message' : err });
     } else {
-      var foundSpoofing = false;
-
-      // Checking individual commits within this Push event
-      for(var commitCounter = 0; commitCounter < commits.length; commitCounter++) {
-        var options = {
-          'host': statusAPIURL.host,
-          'path': statusAPIURL.path.replace('%7Bsha%7D', commits[commitCounter].id),
-          'method': 'POST',
-          'headers' : {
-            'Authorization' : 'token ' + config.github.accessToken,
-            'Accept': 'application/vnd.github.v3+json'
-          }
-        };
-
-        var postData = {};
-
-        //Comparing pusher email with commiter email
-        if(commits[commitCounter].committer.email !== pusher.email) {
-          foundSpoofing = true;
-          setImpersonationCommitStatus(push, options, commitCounter, true);
-        } else {
-          setImpersonationCommitStatus(push, options, commitCounter, false);
-        }
-
-
-
-      }
-
-      setImpersonationPullRequestStatus(push, foundSpoofing);
-      return res.status(200).send({'message' : 'OK' });
-
+      processCommits(push).then(function(foundSpoofing) {
+        logger.debug('gitHubAPI.server.controller.pushValidator - All commits have been processed');
+        setImpersonationPullRequestStatus(push, foundSpoofing);
+        return res.status(200).send({'message' : 'OK' });
+    });
     }
   });
 
