@@ -124,10 +124,11 @@ function setImpersonationCommitStatus(push, options, commitIndex, foundSpoofing)
         commit.save(function(err) {
           if (err) {
             logger.error('gitHubAPI.server.controller.setImpersonationCommitStatus - Failed saving commit : ' + err);
+            reject(foundSpoofing);
+          } else {
+            logger.debug('gitHubAPI.server.controller.setImpersonationCommitStatus - Promise is fulfilled');
+            fulfill(foundSpoofing);
           }
-
-          logger.debug('gitHubAPI.server.controller.setImpersonationCommitStatus - Promise is fulfilled');
-          fulfill(foundSpoofing);
         });
 
         /*
@@ -153,6 +154,7 @@ function setImpersonationCommitStatus(push, options, commitIndex, foundSpoofing)
 
     statusAPIRequest.on('error', function(e) {
       logger.error('gitHubAPI.server.controller.setImpersonationCommitStatus - Problem sending back impersonation commit status : ' + e.message);
+      reject(foundSpoofing);
     });
 
     // write data to request body
