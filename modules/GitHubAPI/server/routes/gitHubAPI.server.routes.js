@@ -12,10 +12,7 @@ module.exports = function (app) {
 
   app.route('/api/gitHubAPI/deployementStatus').all(gitHubAPIPolicy.isAllowed)
     .post(gitHubAPI.deployementStatus);
-
-  app.route('/api/gitHubAPI/pushValidator').all(gitHubAPIPolicy.isAllowed)
-    .post(gitHubAPI.pushValidator);
-
+    
   app.route('/api/gitHubAPI').all(gitHubAPIPolicy.isAllowed)
     .get(gitHubAPI.list)
     .post(gitHubAPI.call);

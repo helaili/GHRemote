@@ -15,25 +15,19 @@ exports.invokeRolesPolicies = function () {
   acl.allow([{
     roles: ['admin'],
     allows: [{
-      resources: '/api/gitHubAPI',
+      resources: '/api/impersonation',
       permissions: '*'
     }]
   }, {
     roles: ['user'],
     allows: [{
-      resources: '/api/gitHubAPI',
+      resources: '/api/impersonation',
       permissions: ['get', 'post']
     }]
   }, {
     roles: ['guest'],
     allows: [{
-      resources: '/api/gitHubAPI',
-      permissions: ['get']
-     }, {
-      resources: '/api/gitHubAPI/deployement',
-      permissions: ['post']
-     }, {
-      resources: '/api/gitHubAPI/deployementStatus',
+      resources: '/api/impersonation/pushValidator',
       permissions: ['post']
      }]
   }]);
@@ -44,7 +38,6 @@ exports.invokeRolesPolicies = function () {
  */
 exports.isAllowed = function (req, res, next) {
   var roles = (req.user) ? req.user.roles : ['guest'];
-
 
   // Check for user roles
   acl.areAnyRolesAllowed(roles, req.route.path, req.method.toLowerCase(), function (err, isAllowed) {

@@ -84,6 +84,16 @@ module.exports = {
         level : 'info',
         filename: './ghremote.log'
       }
+    },
+    Impersonation : {
+      label: 'Impersonation API',
+      console : {
+        level : 'debug'
+      },
+      file: {
+        level : 'info',
+        filename: './ghremote.log'
+      }
     }
   },
   livereload: true,
