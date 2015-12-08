@@ -8,7 +8,7 @@ module.exports = {
   },
   port: process.env.PORT || 8443,
   db: {
-    uri: process.env.MONGOHQ_URL || process.env.MONGOLAB_URI || 'mongodb://' + (process.env.DB_1_PORT_27017_TCP_ADDR || 'localhost') + '/mean',
+    uri: process.env.MONGOHQ_URL || process.env.MONGOLAB_URI || 'mongodb://' + (process.env.DB_1_PORT_27017_TCP_ADDR || 'localhost') + '/ghremote',
     options: {
       user: '',
       pass: ''
@@ -24,6 +24,33 @@ module.exports = {
     options: {
       stream: 'access.log'
     }
+  },
+  winston: {
+    GitHubAPI : {
+      label: 'GitHub API',
+      file: {
+        level : 'info',
+        filename: '/var/log/ghremote.log'
+      }
+    },
+    Impersonation : {
+      label: 'Impersonation API',
+      file: {
+        level : 'info',
+        filename: '/var/log/ghremote.log'
+      }
+    }
+  },
+  github: {
+    clientID: process.env.GITHUB_ID || 'APP_ID',
+    clientSecret: process.env.GITHUB_SECRET || 'APP_SECRET',
+    accessToken:  process.env.GITHUB_ACCESS_TOKEN  || 'ACCESS_TOKEN',
+    callbackURL: 'http://192.168.231.1:3000/api/auth/github/callback',
+    authorizationURL: 'https://octodemo/login/oauth/authorize',
+    tokenURL: 'https://octodemo/login/oauth/access_token',
+    userProfileURL : 'https://octodemo/api/v3/user',
+    scope : ['user', 'repo', 'notifications', 'admin:org'],
+		githubHost: 'octodemo'
   },
   facebook: {
     clientID: process.env.FACEBOOK_ID || 'APP_ID',
