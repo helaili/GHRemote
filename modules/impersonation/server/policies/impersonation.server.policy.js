@@ -29,7 +29,14 @@ exports.invokeRolesPolicies = function () {
     allows: [{
       resources: '/api/impersonation/pushValidator',
       permissions: ['post']
-     }]
+    }, {
+      resources: '/api/impersonation/getCommit',
+      permissions: ['post']
+    },{
+      resources: '/api/impersonation/getPullRequestCommits',
+      permissions: ['post']
+    }
+  ]
   }]);
 };
 

@@ -1,0 +1,25 @@
+<section ng-controller="ImpersonationController" ng-init="pullRequestStatus()">
+  <div class="page-header">
+    <h1>Pull Request Status</h1>
+  </div>
+  <table class="table">
+      <thead>
+        <tr>
+          <td>SHA1</td>
+          <td>Author</td>
+          <td>Committer</td>
+          <td>Pusher</td>
+        </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="commit in commits" ng-class="{'danger': commit.spoofed==true}">
+        <td>{{commit.id}}</td>
+        <td>{{commit.author.email}}</td>
+        <td>{{commit.committer.email}}</td>
+        <td>{{commit.pusher.email}}</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+</section>

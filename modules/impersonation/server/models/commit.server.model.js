@@ -23,6 +23,12 @@ var CommitSchema = new Schema({
     email : String,
     name : String
   },
+  pusher : {
+			email : String,
+			name : String
+	},
+  repo : String,
+  owner : String,
   url : String,
   timestamp : Date,
   message : String,

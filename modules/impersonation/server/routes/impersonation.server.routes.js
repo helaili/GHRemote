@@ -9,4 +9,10 @@ var impersonationPolicy = require('../policies/impersonation.server.policy'),
 module.exports = function (app) {
   app.route('/api/impersonation/pushValidator').all(impersonationPolicy.isAllowed)
     .post(impersonation.pushValidator);
+
+  app.route('/api/impersonation/getCommit').all(impersonationPolicy.isAllowed)
+    .post(impersonation.getCommit);
+
+  app.route('/api/impersonation/getPullRequestCommits').all(impersonationPolicy.isAllowed)
+    .post(impersonation.getPullRequestCommits);
 };

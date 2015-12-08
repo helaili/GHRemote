@@ -14,6 +14,8 @@ var path = require('path'),
   winston = require('winston'),
   errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller'));
 
+var host = null;
+
 winston.loggers.add('Impersonation', {
   console: {
     level: config.winston.Impersonation.console.level,
@@ -38,15 +40,15 @@ function setImpersonationCommitStatus(push, options, commitIndex, foundSpoofing)
 
     if(foundSpoofing) {
       postData = {
-        "state": "failure",
-        "target_url": "https://example.com/build/status",
+        'state': 'failure',
+        'target_url': 'http://'.concat(host).concat('/impersonation/commit/').concat(push.payload.commits[commitIndex].id),
         "description": "Spoofed commit",
         "context": "security/impersonation/commit"
       };
     } else {
       postData = {
         "state": "success",
-        "target_url": "https://example.com/build/status",
+        "target_url": 'http://'.concat(host).concat('/impersonation/commit/').concat(push.payload.commits[commitIndex].id),
         "description": "Clean commit",
         "context": "security/impersonation/commit"
       };
@@ -66,7 +68,11 @@ function setImpersonationCommitStatus(push, options, commitIndex, foundSpoofing)
       statusAPIResponse.on('end', function() {
         logger.debug('impersonation.server.controller.setImpersonationCommitStatus - Saving commit', push.payload.commits[commitIndex]);
         var commit = new Commit(push.payload.commits[commitIndex]);
+        commit.pusher = push.payload.pusher;
+        commit.repo = push.payload.repository.name;
+        commit.owner =  push.payload.repository.owner.name;
         commit.spoofed = foundSpoofing;
+
         commit.save(function(err) {
           if (err) {
             logger.error('impersonation.server.controller.setImpersonationCommitStatus - Failed saving commit : ' + err);
@@ -117,11 +123,11 @@ function setImpersonationPullRequestStatus(push, foundSpoofing) {
   if(!foundSpoofing) {
     //No spoofing in the last push, so need to go back in time.
     //Leveraging the API to retrieve the commit ids, so we don't rely on commits in the DB which migth have been squashed or removed
-    var statusAPIURL = url.parse(push.payload.repository.commits_url);
+    var commitsAPIURL = url.parse(push.payload.repository.commits_url);
 
     var options = {
-      'host': statusAPIURL.host,
-      'path': statusAPIURL.path.replace('%7B/sha%7D', '?sha='.concat(push.payload.ref)),
+      'host': commitsAPIURL.host,
+      'path': commitsAPIURL.path.replace('%7B/sha%7D', '?sha='.concat(push.payload.ref)),
       'method': 'GET',
       'headers' : {
         'Authorization' : 'token ' + config.github.accessToken,
@@ -185,6 +191,7 @@ function setImpersonationPullRequestStatus(push, foundSpoofing) {
 function sendImpersonationPullRequestStatus(push, foundSpoofing) {
   var statusAPIURL = url.parse(push.payload.repository.statuses_url);
 
+
   //Marking the last commit as spoofed or clean
   var options = {
     'host': statusAPIURL.host,
@@ -196,22 +203,20 @@ function sendImpersonationPullRequestStatus(push, foundSpoofing) {
     }
   };
 
-  var postData = {};
+  var commitsAPIURL = url.parse(push.payload.repository.commits_url);
+  var commitsAPIURLParam = encodeURIComponent('https://'.concat(commitsAPIURL.host).concat(commitsAPIURL.path.replace('%7B/sha%7D', '?sha='.concat(push.payload.ref))));
+  var postData = {
+    'target_url': 'http://'.concat(host).concat('/impersonation/pullRequest?commitsAPIURL=').concat(commitsAPIURLParam),
+    'context': 'security/impersonation/pullRequest'
+  };
+
 
   if(foundSpoofing) {
-    postData = {
-      "state": "failure",
-      "target_url": "https://example.com/build/status",
-      "description": "Spoofed Pull Request",
-      "context": "security/impersonation/pullRequest"
-    };
+    postData.state =  'failure';
+    postData.description = 'Spoofed Pull Request';
   } else {
-    postData = {
-      "state": "success",
-      "target_url": "https://example.com/build/status",
-      "description": "Clean Pull Request",
-      "context": "security/impersonation/pullRequest"
-    };
+    postData.state = 'success';
+    postData.description = 'Clean Pull Request';
   }
 
   var statusAPIRequest = https.request(options, function(statusAPIResponse) {
@@ -296,6 +301,11 @@ exports.pushValidator = function (req, res) {
   var push = new Push();
   push.payload = req.body;
 
+
+  if(!host) {
+    host = req.headers.host;
+  }
+
   logger.debug('Recieving a push event', push.payload);
 
   // Persisting this Push event in the DB
@@ -311,5 +321,80 @@ exports.pushValidator = function (req, res) {
     });
     }
   });
+};
 
+/***
+ * Retrieve the details for one Commit
+ ***/
+
+exports.getCommit = function (req, res) {
+  logger.debug('impersonation.server.controller.getCommitWithPusher - Request for a commit', req.body);
+  Commit.findOne({'id' : req.body.sha}, function (err, doc) {
+    if(err) {
+      logger.error('impersonation.server.controller.getCommitWithPusher - Error retrieving commit', err);
+      return res.status(400).send({'message' : err });
+    } else {
+      logger.debug('impersonation.server.controller.getCommitWithPusher - Found commit', doc);
+      return res.status(200).send(doc);
+    }
+  });
+};
+
+/***
+ * Retrieve the details for every Commit of a pull request
+ ***/
+
+exports.getPullRequestCommits = function (req, res) {
+  logger.debug('impersonation.server.controller.getPullRequestCommitsWithPusher - Request for commits of a Pull Request', req.body);
+
+  var commitsAPIURL = url.parse(req.body.commitsAPIURL);
+
+  var options = {
+    'host': commitsAPIURL.host,
+    'path': commitsAPIURL.path,
+    'method': 'GET',
+    'headers' : {
+      'Authorization' : 'token ' + config.github.accessToken,
+      'Accept': 'application/vnd.github.v3+json'
+    }
+  };
+
+  var statusAPIRequest = https.request(options, function(statusAPIResponse) {
+    var responseBodyStr = '';
+    logger.debug('impersonation.server.controller.getPullRequestCommitsWithPusher - HTTP target : ' + options.path);
+    logger.debug('impersonation.server.controller.getPullRequestCommitsWithPusher - HTTP status : ' + statusAPIResponse.statusCode);
+    logger.debug('impersonation.server.controller.getPullRequestCommitsWithPusher - HTTP headers', statusAPIResponse.headers);
+
+    statusAPIResponse.setEncoding('utf8');
+
+    statusAPIResponse.on('data', function (chunk) {
+      responseBodyStr = responseBodyStr.concat(chunk);
+    });
+
+    statusAPIResponse.on('end', function() {
+      var commitArray = JSON.parse(responseBodyStr);
+      var idArray = [];
+      for(var commitIndex in commitArray) {
+        idArray.push(commitArray[commitIndex].sha);
+      }
+      logger.debug('impersonation.server.controller.getPullRequestCommitsWithPusher - Commit IDs ' + idArray);
+
+      //Got my array of ids, now I need to check wheter one of those SHA was spoofed
+      Commit.find({'id' : {'$in':  idArray}}, function(err, result) {
+        if (err) {
+          logger.error('impersonation.server.controller.getPullRequestCommitsWithPusher - Problem retrieving the commits on this Pull Request', err);
+          return res.status(400).send({'message' : err });
+        } else {
+          logger.debug('impersonation.server.controller.getPullRequestCommitsWithPusher - Retrieved ' + result.length + ' commits.');
+          return res.status(200).send(result);
+        }
+      });
+    });
+  });
+
+  statusAPIRequest.on('error', function(e) {
+    logger.error('impersonation.server.controller.getPullRequestCommitsWithPusher - Problem retrieving commit status on ' + commitsAPIURL, e);
+  });
+
+  statusAPIRequest.end();
 };
