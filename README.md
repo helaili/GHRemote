@@ -12,6 +12,6 @@ export GITHUB_ACCESS_TOKEN=<your access token>
 export GITHUB_ID=<your id>
 export GITHUB_SECRET=<your secret>
 ```
-- ```cd cd GHRemote```
+- ```cd GHRemote```
 - ```grunt```
 
