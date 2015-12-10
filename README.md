@@ -1,31 +1,10 @@
-- Remember to set the right IP address in config/env/development.js
-- Change the callback url accordingly in GitHub's developer application
-- Create an OAUTH app as well as a Personal Access Token
-- GITHUB_ACCESS_TOKEN, GITHUB_ID and GITHUB_SECRET must be set as env variables
+## Deploying the production environement 
 
+- Provision an AWS machine 
+- Run ```./scripts/install_GHRemote_aws.sh <path_to_pem_file> <hostname>```
+- Reboot the AWS machine 
+- Create a personal access token (GITHUB_ACCESS_TOKEN) in you GitHub profile
+- Configure the GitHub section of the file config/env/production.js with the right IP address/hostname
+- Create an OAUTH app and retrive the GITHUB_ID and GITHUB_SECRET. Info should match config/env/production.js 
+- Run ```./scripts/set_github_env_variables.sh <path_to_pem_file> <hostname> <GITHUB_ACCESS_TOKEN> <GITHUB_ID> <GITHUB_SECRET>```
 
-http(s)://hostname/api/v3/
-
-
-application/json
-application/vnd.github+json
-
-application/vnd.github.v3+json
-
-
-$ curl https://api.github.com/users/technoweenie -I
-HTTP/1.1 200 OK
-X-GitHub-Media-Type: github.v3
-
-$ curl https://api.github.com/users/technoweenie -I \
-  -H "Accept: application/vnd.github.full+json"
-HTTP/1.1 200 OK
-X-GitHub-Media-Type: github.v3; param=full; format=json
-
-$ curl https://api.github.com/users/technoweenie -I \
-  -H "Accept: application/vnd.github.v3.full+json"
-HTTP/1.1 200 OK
-X-GitHub-Media-Type: github.v3; param=full; format=json
-
-
-/user/orgs
