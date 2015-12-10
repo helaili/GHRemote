@@ -13,6 +13,6 @@ export GITHUB_ID=<your id>
 export GITHUB_SECRET=<your secret>
 ```
 - ```cd GHRemote```
-- ```grunt```
+- ```grunt prod```
 - Register the webhook ```http://<your server name>/api/impersonation/pushValidator``` with you repository or organization
 
