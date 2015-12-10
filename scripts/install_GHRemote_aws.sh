@@ -52,5 +52,7 @@ sudo npm install -g bower
 
 sudo npm install -g grunt-cli
 
+sudo yum install -y git 
+
 git clone https://github.com/helaili/GHRemote.git
 EOF
