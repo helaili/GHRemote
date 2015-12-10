@@ -94,6 +94,16 @@ module.exports = {
         level : 'info',
         filename: './ghremote.log'
       }
+    },
+    Deployment : {
+      label: 'Deployment API',
+      console : {
+        level : 'debug'
+      },
+      file: {
+        level : 'info',
+        filename: './ghremote.log'
+      }
     }
   },
   livereload: true,
