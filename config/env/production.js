@@ -2,11 +2,11 @@
 
 module.exports = {
   secure: {
-    ssl: true,
+    ssl: false,
     privateKey: './config/sslcerts/key.pem',
     certificate: './config/sslcerts/cert.pem'
   },
-  port: process.env.PORT || 8443,
+  port: process.env.PORT || 80,
   db: {
     uri: process.env.MONGOHQ_URL || process.env.MONGOLAB_URI || 'mongodb://' + (process.env.DB_1_PORT_27017_TCP_ADDR || 'localhost') + '/ghremote',
     options: {
@@ -45,12 +45,12 @@ module.exports = {
     clientID: process.env.GITHUB_ID || 'APP_ID',
     clientSecret: process.env.GITHUB_SECRET || 'APP_SECRET',
     accessToken:  process.env.GITHUB_ACCESS_TOKEN  || 'ACCESS_TOKEN',
-    callbackURL: 'http://192.168.231.1:3000/api/auth/github/callback',
-    authorizationURL: 'https://octodemo/login/oauth/authorize',
-    tokenURL: 'https://octodemo/login/oauth/access_token',
-    userProfileURL : 'https://octodemo/api/v3/user',
+    callbackURL: 'http://ghremote.octodemo.com/api/auth/github/callback',
+    authorizationURL: 'https://octodemo.com/login/oauth/authorize',
+    tokenURL: 'https://octodemo.com/login/oauth/access_token',
+    userProfileURL : 'https://octodemo.com/api/v3/user',
     scope : ['user', 'repo', 'notifications', 'admin:org'],
-		githubHost: 'octodemo'
+		githubHost: 'octodemo.com'
   },
   facebook: {
     clientID: process.env.FACEBOOK_ID || 'APP_ID',
