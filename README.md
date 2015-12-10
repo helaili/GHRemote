@@ -14,4 +14,5 @@ export GITHUB_SECRET=<your secret>
 ```
 - ```cd GHRemote```
 - ```grunt```
+- Register the webhook ```http://<your server name>/api/impersonation/pushValidator``` with you repository or organization
 
