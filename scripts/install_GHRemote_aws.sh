@@ -1,4 +1,4 @@
-ssh -tt -i ~/Documents/AWS/helaili.pem ec2-user@$1 << 'EOF'
+ssh -tt -i $1 ec2-user@$2 << 'EOF'
 
 
 echo '#!/bin/sh' | sudo tee /etc/init.d/disable-transparent-hugepages
