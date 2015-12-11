@@ -127,7 +127,7 @@ function setImpersonationPullRequestStatus(push, foundSpoofing) {
 
     var options = {
       'host': commitsAPIURL.host,
-      'path': commitsAPIURL.path.replace('%7B/sha%7D', '?sha='.concat(push.payload.ref)),
+      'path': commitsAPIURL.path.replace('%7B/sha%7D', '?sha='.concat(push.payload.ref)).replace('{/sha}', '?sha='.concat(push.payload.ref)),
       'method': 'GET',
       'headers' : {
         'Authorization' : 'token ' + config.github.accessToken,
@@ -195,11 +195,12 @@ function setImpersonationPullRequestStatus(push, foundSpoofing) {
 function sendImpersonationPullRequestStatus(push, foundSpoofing) {
   var statusAPIURL = url.parse(push.payload.repository.statuses_url);
 
+  var sha =  push.payload.commits[push.payload.commits.length-1].id;
 
   //Marking the last commit as spoofed or clean
   var options = {
     'host': statusAPIURL.host,
-    'path': statusAPIURL.path.replace('%7Bsha%7D', push.payload.commits[push.payload.commits.length-1].id),
+    'path': statusAPIURL.path.replace('%7Bsha%7D',sha).replace('{sha}', sha),
     'method': 'POST',
     'headers' : {
       'Authorization' : 'token ' + config.github.accessToken,
@@ -208,7 +209,7 @@ function sendImpersonationPullRequestStatus(push, foundSpoofing) {
   };
 
   var commitsAPIURL = url.parse(push.payload.repository.commits_url);
-  var commitsAPIURLParam = encodeURIComponent('https://'.concat(commitsAPIURL.host).concat(commitsAPIURL.path.replace('%7B/sha%7D', '?sha='.concat(push.payload.ref))));
+  var commitsAPIURLParam = encodeURIComponent('https://'.concat(commitsAPIURL.host).concat(commitsAPIURL.path.replace('%7B/sha%7D', '?sha='.concat(push.payload.ref)).replace('{/sha}', '?sha='.concat(push.payload.ref))));
   var postData = {
     'target_url': 'http://'.concat(host).concat('/impersonation/pullRequest?commitsAPIURL=').concat(commitsAPIURLParam),
     'context': 'security/impersonation/pullRequest'
@@ -267,7 +268,7 @@ function processCommits(push) {
 
       var options = {
         'host': statusAPIURL.host,
-        'path': statusAPIURL.path.replace('%7Bsha%7D', commits[commitCounter].id),
+        'path': statusAPIURL.path.replace('%7Bsha%7D', commits[commitCounter].id).replace('{sha}', commits[commitCounter].id),
         'method': 'POST',
         'headers' : {
           'Authorization' : 'token ' + config.github.accessToken,
