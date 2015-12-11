@@ -33,7 +33,7 @@ module.exports = {
       },
       file: {
         level : 'info',
-        filename: '/var/log/ghremote.log'
+        filename: '/var/log/ghremote/ghremote.log'
       }
     },
     Impersonation : {
@@ -43,7 +43,7 @@ module.exports = {
       },
       file: {
         level : 'info',
-        filename: '/var/log/ghremote.log'
+        filename: '/var/log/ghremote/ghremote.log'
       }
     },
     Deployment : {
@@ -53,7 +53,7 @@ module.exports = {
       },
       file: {
         level : 'info',
-        filename: './ghremote.log'
+        filename: '/var/log/ghremote/ghremote.log'
       }
     }
   },

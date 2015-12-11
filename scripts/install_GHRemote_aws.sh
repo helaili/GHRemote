@@ -35,18 +35,17 @@ sudo chmod 755 /etc/init.d/disable-transparent-hugepages
 
 sudo chkconfig --add disable-transparent-hugepages
 
-
 echo '[mongodb-org-3.0]' | sudo tee /etc/yum.repos.d/mongodb-org-3.0.repo
 echo 'name=MongoDB Repository' | sudo tee -a /etc/yum.repos.d/mongodb-org-3.0.repo
 echo 'baseurl=https://repo.mongodb.org/yum/amazon/2013.03/mongodb-org/3.0/x86_64/' | sudo tee -a /etc/yum.repos.d/mongodb-org-3.0.repo
 echo 'gpgcheck=0' | sudo tee -a /etc/yum.repos.d/mongodb-org-3.0.repo
 echo 'enabled=1' | sudo tee -a /etc/yum.repos.d/mongodb-org-3.0.repo
 
-sudo iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-ports 8080
-
 sudo yum -y update
 
 sudo yum install -y mongodb-org
+
+sudo iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-ports 8080
 
 sudo yum install -y nodejs npm --enablerepo=epel
 
@@ -57,6 +56,10 @@ sudo npm install -g bower
 sudo npm install -g grunt-cli
 
 sudo gem install sass
+
+sudo mkdir /var/log/ghremote
+
+sudo chown ec2-user:ec2-user /var/log/ghremote
 
 git clone https://github.com/helaili/GHRemote.git
 
