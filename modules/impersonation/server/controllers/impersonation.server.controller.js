@@ -31,6 +31,14 @@ winston.loggers.add('Impersonation', {
 
  var logger = winston.loggers.get('Impersonation');
 
+function formatCommitsAPIURLPath(urlStr, value) {
+  return urlStr.replace('%7B/sha%7D', '?sha='.concat(value)).replace('{/sha}', '?sha='.concat(value));
+}
+
+function formatStatusAPIURLPath(urlStr, value) {
+  return urlStr.replace('%7Bsha%7D',value).replace('{sha}', value);
+}
+
 /***
  * Checking the status of one commit
  ***/
@@ -127,7 +135,7 @@ function setImpersonationPullRequestStatus(push, foundSpoofing) {
 
     var options = {
       'host': commitsAPIURL.host,
-      'path': commitsAPIURL.path.replace('%7B/sha%7D', '?sha='.concat(push.payload.ref)).replace('{/sha}', '?sha='.concat(push.payload.ref)),
+      'path': formatCommitsAPIURLPath(commitsAPIURL.path, push.payload.ref),
       'method': 'GET',
       'headers' : {
         'Authorization' : 'token ' + config.github.accessToken,
@@ -186,6 +194,9 @@ function setImpersonationPullRequestStatus(push, foundSpoofing) {
 
     statusAPIRequest.end();
 
+  } else {
+    //No need to check anything as the a commit in the push is spoofed
+    sendImpersonationPullRequestStatus(push, true);
   }
 }
 
@@ -200,7 +211,7 @@ function sendImpersonationPullRequestStatus(push, foundSpoofing) {
   //Marking the last commit as spoofed or clean
   var options = {
     'host': statusAPIURL.host,
-    'path': statusAPIURL.path.replace('%7Bsha%7D',sha).replace('{sha}', sha),
+    'path': formatStatusAPIURLPath(statusAPIURL.path, sha),
     'method': 'POST',
     'headers' : {
       'Authorization' : 'token ' + config.github.accessToken,
@@ -209,7 +220,7 @@ function sendImpersonationPullRequestStatus(push, foundSpoofing) {
   };
 
   var commitsAPIURL = url.parse(push.payload.repository.commits_url);
-  var commitsAPIURLParam = encodeURIComponent('https://'.concat(commitsAPIURL.host).concat(commitsAPIURL.path.replace('%7B/sha%7D', '?sha='.concat(push.payload.ref)).replace('{/sha}', '?sha='.concat(push.payload.ref))));
+  var commitsAPIURLParam = encodeURIComponent('https://'.concat(commitsAPIURL.host).concat(formatCommitsAPIURLPath(commitsAPIURL.path, push.payload.ref)));
   var postData = {
     'target_url': 'http://'.concat(host).concat('/impersonation/pullRequest?commitsAPIURL=').concat(commitsAPIURLParam),
     'context': 'security/impersonation/pullRequest'
@@ -268,7 +279,7 @@ function processCommits(push) {
 
       var options = {
         'host': statusAPIURL.host,
-        'path': statusAPIURL.path.replace('%7Bsha%7D', commits[commitCounter].id).replace('{sha}', commits[commitCounter].id),
+        'path': formatStatusAPIURLPath(statusAPIURL.path, commits[commitCounter].id),
         'method': 'POST',
         'headers' : {
           'Authorization' : 'token ' + config.github.accessToken,
