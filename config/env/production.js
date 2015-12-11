@@ -28,6 +28,9 @@ module.exports = {
   winston: {
     GitHubAPI : {
       label: 'GitHub API',
+      console : {
+        level : 'info'
+      },
       file: {
         level : 'info',
         filename: '/var/log/ghremote.log'
@@ -35,9 +38,22 @@ module.exports = {
     },
     Impersonation : {
       label: 'Impersonation API',
+      console : {
+        level : 'info'
+      },
       file: {
         level : 'info',
         filename: '/var/log/ghremote.log'
+      }
+    },
+    Deployment : {
+      label: 'Deployment API',
+      console : {
+        level : 'info'
+      },
+      file: {
+        level : 'info',
+        filename: './ghremote.log'
       }
     }
   },

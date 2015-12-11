@@ -48,11 +48,18 @@ sudo yum install -y mongodb-org
 
 sudo yum install -y nodejs npm --enablerepo=epel
 
+sudo yum install -y git
+
 sudo npm install -g bower
 
 sudo npm install -g grunt-cli
 
-sudo yum install -y git 
+sudo gem install sass
 
 git clone https://github.com/helaili/GHRemote.git
+
+cd GHRemote
+
+npm install
+
 EOF
