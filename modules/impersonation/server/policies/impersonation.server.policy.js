@@ -25,7 +25,7 @@ exports.invokeRolesPolicies = function () {
       permissions: ['get', 'post']
     }]
   }, {
-    roles: ['guest'],
+    roles: ['guest', 'user', 'admin'],
     allows: [{
       resources: '/api/impersonation/pushValidator',
       permissions: ['post']

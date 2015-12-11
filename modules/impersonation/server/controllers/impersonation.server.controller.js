@@ -31,10 +31,19 @@ winston.loggers.add('Impersonation', {
 
  var logger = winston.loggers.get('Impersonation');
 
+
+/***
+ * Injecting a sha in the URL retrieved from an API call reponse.
+ * Seems like '{' and '}' are different on Unix and Mac
+ ***/
 function formatCommitsAPIURLPath(urlStr, value) {
   return urlStr.replace('%7B/sha%7D', '?sha='.concat(value)).replace('{/sha}', '?sha='.concat(value));
 }
 
+/***
+ * Injecting a sha in the URL retrieved from an API call reponse.
+ * Seems like '{' and '}' are different on Unix and Mac
+ ***/
 function formatStatusAPIURLPath(urlStr, value) {
   return urlStr.replace('%7Bsha%7D',value).replace('{sha}', value);
 }
@@ -344,13 +353,13 @@ exports.pushValidator = function (req, res) {
  ***/
 
 exports.getCommit = function (req, res) {
-  logger.debug('impersonation.server.controller.getCommitWithPusher - Request for a commit', req.body);
+  logger.debug('impersonation.server.controller.getCommitWith - Request for a commit', req.body);
   Commit.findOne({'id' : req.body.sha}, function (err, doc) {
     if(err) {
-      logger.error('impersonation.server.controller.getCommitWithPusher - Error retrieving commit', err);
+      logger.error('impersonation.server.controller.getCommit - Error retrieving commit', err);
       return res.status(400).send({'message' : err });
     } else {
-      logger.debug('impersonation.server.controller.getCommitWithPusher - Found commit', doc);
+      logger.debug('impersonation.server.controller.getCommit - Found commit');
       return res.status(200).send(doc);
     }
   });
