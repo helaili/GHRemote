@@ -45,7 +45,7 @@ sudo yum -y update
 
 sudo yum install -y mongodb-org
 
-sudo iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-ports 8080
+sudo iptables -t nat -A PREROUTING -p tcp --dport 443 -j REDIRECT --to-ports 8443
 
 sudo yum install -y nodejs npm --enablerepo=epel
 
