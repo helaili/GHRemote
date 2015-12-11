@@ -164,12 +164,14 @@ function setImpersonationPullRequestStatus(push, foundSpoofing) {
           } else {
             logger.debug('impersonation.server.controller.setImpersonationPullRequestStatus - Retrieved spoofed commit count', result);
 
-            if(result[0].spoofedCount > 0) {
-              logger.debug('impersonation.server.controller.setImpersonationPullRequestStatus - Pull Request is spoofed');
-              sendImpersonationPullRequestStatus(push, true);
-            } else {
-              logger.debug('impersonation.server.controller.setImpersonationPullRequestStatus - Pull Request is clean');
-              sendImpersonationPullRequestStatus(push, false);
+            if(result && result[0] && result[0].spoofedCount) {
+              if(result[0].spoofedCount > 0) {
+                logger.debug('impersonation.server.controller.setImpersonationPullRequestStatus - Pull Request is spoofed');
+                sendImpersonationPullRequestStatus(push, true);
+              } else {
+                logger.debug('impersonation.server.controller.setImpersonationPullRequestStatus - Pull Request is clean');
+                sendImpersonationPullRequestStatus(push, false);
+              }
             }
           }
         });
