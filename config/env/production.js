@@ -61,7 +61,7 @@ module.exports = {
     clientID: process.env.GITHUB_ID || 'APP_ID',
     clientSecret: process.env.GITHUB_SECRET || 'APP_SECRET',
     accessToken:  process.env.GITHUB_ACCESS_TOKEN  || 'ACCESS_TOKEN',
-    callbackURL: 'http://ghremote.octodemo.com/api/auth/github/callback',
+    callbackURL: 'http://ghremote.octodemo.com:8080/api/auth/github/callback',
     authorizationURL: 'https://octodemo.com/login/oauth/authorize',
     tokenURL: 'https://octodemo.com/login/oauth/access_token',
     userProfileURL : 'https://octodemo.com/api/v3/user',
