@@ -172,6 +172,8 @@ function setImpersonationPullRequestStatus(push, foundSpoofing) {
                 logger.debug('impersonation.server.controller.setImpersonationPullRequestStatus - Pull Request is clean');
                 sendImpersonationPullRequestStatus(push, false);
               }
+            } else {
+              sendImpersonationPullRequestStatus(push, true);
             }
           }
         });

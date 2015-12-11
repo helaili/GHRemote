@@ -31,7 +31,7 @@ module.exports = {
     GitHubAPI : {
       label: 'GitHub API',
       console : {
-        level : 'info'
+        level : 'debug'
       },
       file: {
         level : 'info',
@@ -41,7 +41,7 @@ module.exports = {
     Impersonation : {
       label: 'Impersonation API',
       console : {
-        level : 'info'
+        level : 'debug'
       },
       file: {
         level : 'info',
@@ -51,7 +51,7 @@ module.exports = {
     Deployment : {
       label: 'Deployment API',
       console : {
-        level : 'info'
+        level : 'debug'
       },
       file: {
         level : 'info',
