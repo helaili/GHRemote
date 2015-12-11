@@ -42,6 +42,8 @@ echo 'baseurl=https://repo.mongodb.org/yum/amazon/2013.03/mongodb-org/3.0/x86_64
 echo 'gpgcheck=0' | sudo tee -a /etc/yum.repos.d/mongodb-org-3.0.repo
 echo 'enabled=1' | sudo tee -a /etc/yum.repos.d/mongodb-org-3.0.repo
 
+sudo iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-ports 8080
+
 sudo yum -y update
 
 sudo yum install -y mongodb-org
