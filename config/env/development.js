@@ -104,6 +104,16 @@ module.exports = {
         level : 'info',
         filename: './ghremote.log'
       }
+    },
+    Home : {
+      label: 'Home page',
+      console : {
+        level : 'debug'
+      },
+      file: {
+        level : 'info',
+        filename: './ghremote.log'
+      }
     }
   },
   livereload: true,

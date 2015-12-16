@@ -11,20 +11,55 @@
         A bunch of stuff for your GitHub repositories
       </p>
     </div>
-    <div class="row" ng-controller="HeaderController">
-      <p>
-        <a class="btn btn-primary btn-lg" ng-click="callOauthProvider('/api/auth/github')" href="">Sign In With GitHub</a>
-      </p>
-    </div>
   </div>
+  <br>
   <div class="well">
     <h2>Webooks</h2>
     <p>
       Couple Webhooks to add to you repository or your organization
-      <ul>
+      <ul ng-if="!authentication.user">
         <li>Impersonation</li>
         <li>Deployment</li>
       </ul>
+      <form ng-if="authentication.user" class="form-horizontal" data-ng-submit="update()" novalidate>
+        <div class="form-group">
+          <label for="webhookSelect" class="col-sm-2 control-label">Webhook</label>
+          <div class="col-sm-6">
+            <select ng-model="webhookSelection" class="form-control" name="webhookSelect" id="webhookSelect" ng-options="option.name for option in webhookList track by option.id"></select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="control-label col-sm-2" for="repository">Repository</label>
+          <div class="col-sm-6">
+            <input type="text" name="repository" ng-model="asyncRepositorySelected" placeholder="Repository"
+                uib-typeahead="repository as repository.full_name for repository in getRepositories($viewValue)"
+                typeahead-loading="loadingRepositories" typeahead-no-results="noRepositorytResults"
+                class="form-control">
+            <i ng-show="loadingRepositories" class="glyphicon glyphicon-refresh"></i>
+            <div ng-show="noRepositorytResults">
+              <i class="glyphicon glyphicon-remove"></i> No Results Found
+            </div>
+          </div>
+          <div class="col-sm-2">
+            <button type="button" id="addWebHookToRepo" data-loading-text="Loading..." ng-disabled="noRepositorytResults" class="btn btn-primary form-control" autocomplete="off">Add Webhook</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="control-label col-sm-2" for="organization">Organization</label>
+          <div class="col-sm-6">
+            <input type="text" ng-model="asyncOrganizationSelected" placeholder="Organization"
+                    uib-typeahead="organization as organization.login for organization in getOrganizations($viewValue)"
+                    typeahead-loading="loadingOrganizations" typeahead-no-results="noOrganizationResults"
+                    class="form-control">
+            <i ng-show="loadingOrganizations" class="glyphicon glyphicon-refresh"></i>
+            <div ng-show="noOrganizationResults">
+              <i class="glyphicon glyphicon-remove"></i> No Results Found
+            </div>
+          </div>
+          <div class="col-sm-2">
+            <button type="button" id="addWebHookToOrg" data-loading-text="Loading..." ng-disabled="noOrganizationResults" class="btn btn-primary form-control" ng-click="addWebhookToOrg(asyncOrganizationSelected)" autocomplete="off">Add Webhook</button>
+          </div>
+        </div>
+      </form>
     </p>
-  </div>
 </section>

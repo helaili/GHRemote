@@ -15,7 +15,7 @@ module.exports = {
         'public/lib/angular-messages/angular-messages.js',
         'public/lib/angular-ui-router/release/angular-ui-router.js',
         'public/lib/angular-ui-utils/ui-utils.js',
-        'public/lib/angular-bootstrap/ui-bootstrap-tpls.js',
+        'public/lib/angular-bootstrap/ui-bootstrap-tpls-0.14.3.js',
         'public/lib/angular-file-upload/angular-file-upload.js',
         'public/lib/jquery/dist/jquery.min.js',
         'public/lib/bootstrap/dist/js/bootstrap.min.js',
