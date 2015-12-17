@@ -29,6 +29,9 @@ exports.invokeRolesPolicies = function () {
     }, {
       resources: '/api/home/addWebhook',
       permissions: ['post']
+    }, {
+      resources: '/api/home/getWebhooks',
+      permissions: ['get']
     }]
   }]);
 };

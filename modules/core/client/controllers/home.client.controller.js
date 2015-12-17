@@ -4,10 +4,31 @@ angular.module('core').controller('HomeController', ['$scope', '$http', '$filter
   function ($scope, $http, $filter, Authentication, HomeServices) {
     // This provides Authentication context.
     $scope.authentication = Authentication;
-    $scope.webhookSelection = {'id' : '1', 'name' : 'Impersonation checker'};
-    $scope.webhookList = [
-      {'id' : '1', 'name' : 'Impersonation checker'},
-      {'id' : '2', 'name' : 'Deployment orchestrator'}];
+    /*$scope.webhookList = [
+      { 'label': 'Impersonation Checker',
+        'name' : 'web',
+        'active': true,
+        'events': ['push', 'pull_request'],
+        'config': {
+          'url': 'http://example.com/webhook',
+          'content_type': 'json'
+        }
+      },
+      { 'label': 'Deployment Orchestrator',
+        'name' : 'web',
+        'active': true,
+        'events': ['deploy'],
+        'config': {
+          'url': 'http://example.com/webhook',
+          'content_type': 'json'
+        }
+      }];*/
+    HomeServices.getWebhooks(function(response) {
+        $scope.webhookList = response;
+        $scope.webhookSelection = $scope.webhookList[0];
+    });
+
+
 
     $scope.organizationsPromise = undefined;
     $scope.repositoriesPromise = undefined;
@@ -34,17 +55,17 @@ angular.module('core').controller('HomeController', ['$scope', '$http', '$filter
       });
     };
 
-    $scope.addWebhookToOrg = function(org) {
-      //Make sure we have a selection in the dropdown and not a partial string 
-      if(org &&  typeof org === 'object') {
+    $scope.addWebhook = function(target, type) {
+      //Make sure we have a selection in the dropdown and not a partial string
+      if(target &&  typeof target === 'object') {
         var data = {
           'webhook' : $scope.webhookSelection,
-          'targetType' : 'org',
-          'target' : org
+          'targetType' : type,
+          'target' : target
         };
 
         HomeServices.addWebhook(data, function(response) {
-
+            return response;
         });
       }
     };

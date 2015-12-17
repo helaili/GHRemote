@@ -11,6 +11,9 @@ var _ = require('lodash'),
  * User middleware
  */
 exports.userByID = function (req, res, next, id) {
+  console.log('********');
+  console.log(id);
+  
   if (!mongoose.Types.ObjectId.isValid(id)) {
     return res.status(400).send({
       message: 'User is invalid'

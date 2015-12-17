@@ -17,6 +17,11 @@ angular.module('core').factory('HomeServices', ['$resource',
       addWebhook : {
         method : 'POST',
       	url : 'api/home/addWebhook'
+      },
+      getWebhooks : {
+        method : 'GET',
+      	url : '/api/home/getWebhooks',
+        isArray: true
       }
     });
   }

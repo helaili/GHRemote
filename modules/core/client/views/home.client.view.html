@@ -16,7 +16,7 @@
   <div class="well">
     <h2>Webooks</h2>
     <p>
-      Couple Webhooks to add to you repository or your organization
+      Couple Webhooks to add to your repository or your organization
       <ul ng-if="!authentication.user">
         <li>Impersonation</li>
         <li>Deployment</li>
@@ -25,7 +25,7 @@
         <div class="form-group">
           <label for="webhookSelect" class="col-sm-2 control-label">Webhook</label>
           <div class="col-sm-6">
-            <select ng-model="webhookSelection" class="form-control" name="webhookSelect" id="webhookSelect" ng-options="option.name for option in webhookList track by option.id"></select>
+            <select ng-model="webhookSelection" class="form-control" name="webhookSelect" id="webhookSelect" ng-options="option.label for option in webhookList"></select>
           </div>
         </div>
         <div class="form-group">
@@ -41,7 +41,8 @@
             </div>
           </div>
           <div class="col-sm-2">
-            <button type="button" id="addWebHookToRepo" data-loading-text="Loading..." ng-disabled="noRepositorytResults" class="btn btn-primary form-control" autocomplete="off">Add Webhook</button>
+            <button type="button" id="addWebHookToRepo" data-loading-text="Loading..." ng-disabled="noRepositorytResults" class="btn btn-primary form-control"
+                    ng-click="addWebhook(asyncRepositorySelected, 'repo')" autocomplete="off">Add Webhook</button>
           </div>
         </div>
         <div class="form-group">
@@ -57,7 +58,8 @@
             </div>
           </div>
           <div class="col-sm-2">
-            <button type="button" id="addWebHookToOrg" data-loading-text="Loading..." ng-disabled="noOrganizationResults" class="btn btn-primary form-control" ng-click="addWebhookToOrg(asyncOrganizationSelected)" autocomplete="off">Add Webhook</button>
+            <button type="button" id="addWebHookToOrg" data-loading-text="Loading..." ng-disabled="noOrganizationResults" class="btn btn-primary form-control"
+            ng-click="addWebhook(asyncOrganizationSelected, 'org')" autocomplete="off">Add Webhook</button>
           </div>
         </div>
       </form>

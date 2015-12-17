@@ -8,10 +8,12 @@ var homePolicy = require('../policies/home.server.policy'),
 
 
 module.exports = function (app) {
+  app.route('/api/home/getWebhooks').get(home.getWebhooks);
   app.route('/api/home/getOrganizations').all(homePolicy.isAllowed)
     .post(home.getOrganizations);
   app.route('/api/home/getRepositories').all(homePolicy.isAllowed)
     .post(home.getRepositories);
-    app.route('/api/home/addWebhook').all(homePolicy.isAllowed)
+  app.route('/api/home/addWebhook').all(homePolicy.isAllowed)
       .post(home.addWebhook);
+
 };

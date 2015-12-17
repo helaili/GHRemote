@@ -18,6 +18,26 @@ module.exports = {
     // Enable mongoose debug mode
     debug: process.env.MONGODB_DEBUG || false
   },
+  webhookList : [
+    { 'label': 'Impersonation Checker',
+      'name' : 'web',
+      'active': true,
+      'events': ['push'],
+      'config': {
+        'url': 'https://ghremote.octodemo.com/api/impersonation/pushValidator',
+        'content_type': 'json'
+      }
+    },
+    { 'label': 'Deployment Orchestrator',
+      'name' : 'web',
+      'active': true,
+      'events': ['deployment'],
+      'config': {
+        'url': 'https://ghremote.octodemo.com/api/impersonation/pushValidator',
+        'content_type': 'json'
+      }
+    }
+  ],
   log: {
     // Can specify one of 'combined', 'common', 'dev', 'short', 'tiny'
     format: 'combined',

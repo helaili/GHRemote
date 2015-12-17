@@ -7,6 +7,7 @@ var path = require('path'),
   mongoose = require('mongoose'),
   Push = mongoose.model('Push'),
   Commit = mongoose.model('Commit'),
+  User = mongoose.model('User'),
 	url = require('url'),
 	https = require('https'),
   querystring = require('querystring'),
@@ -136,7 +137,7 @@ function setImpersonationCommitStatus(push, options, commitIndex, foundSpoofing)
  * The last commit might be ok, but some previous ones might have been spoofed.
  * We need to prevent the merge of the PR until the history has been cleaned.
  ***/
-function setImpersonationPullRequestStatus(push, foundSpoofing) {
+function setImpersonationPullRequestStatus(user, push, foundSpoofing) {
   if(!foundSpoofing) {
     //No spoofing in the last push, so need to go back in time.
     //Leveraging the API to retrieve the commit ids, so we don't rely on commits in the DB which migth have been squashed or removed
@@ -147,7 +148,7 @@ function setImpersonationPullRequestStatus(push, foundSpoofing) {
       'path': formatCommitsAPIURLPath(commitsAPIURL.path, push.payload.ref),
       'method': 'GET',
       'headers' : {
-        'Authorization' : 'token ' + config.github.accessToken,
+        'Authorization' : 'token ' + user.providerData.accessToken,
         'Accept': 'application/vnd.github.v3+json'
       }
     };
@@ -177,20 +178,20 @@ function setImpersonationPullRequestStatus(push, foundSpoofing) {
           if (err) {
             logger.error('impersonation.server.controller.setImpersonationPullRequestStatus - Problem retrieving the number of spoofed commits on this Pull Request', err);
             //We should then mark the PR spoofed?
-            sendImpersonationPullRequestStatus(push, true);
+            sendImpersonationPullRequestStatus(user, push, true);
           } else {
             logger.debug('impersonation.server.controller.setImpersonationPullRequestStatus - Retrieved spoofed commit count', result);
 
             if(result && result[0] && result[0].spoofedCount) {
               if(result[0].spoofedCount > 0) {
                 logger.debug('impersonation.server.controller.setImpersonationPullRequestStatus - Pull Request is spoofed');
-                sendImpersonationPullRequestStatus(push, true);
+                sendImpersonationPullRequestStatus(user, push, true);
               } else {
                 logger.debug('impersonation.server.controller.setImpersonationPullRequestStatus - Pull Request is clean');
-                sendImpersonationPullRequestStatus(push, false);
+                sendImpersonationPullRequestStatus(user, push, false);
               }
             } else {
-              sendImpersonationPullRequestStatus(push, true);
+              sendImpersonationPullRequestStatus(user, push, true);
             }
           }
         });
@@ -205,14 +206,14 @@ function setImpersonationPullRequestStatus(push, foundSpoofing) {
 
   } else {
     //No need to check anything as the a commit in the push is spoofed
-    sendImpersonationPullRequestStatus(push, true);
+    sendImpersonationPullRequestStatus(user, push, true);
   }
 }
 
 /***
  * Does the actual send of status for the PR (on the last commit) through HTTP POST
  ***/
-function sendImpersonationPullRequestStatus(push, foundSpoofing) {
+function sendImpersonationPullRequestStatus(user, push, foundSpoofing) {
   var statusAPIURL = url.parse(push.payload.repository.statuses_url);
 
   var sha =  push.payload.commits[push.payload.commits.length-1].id;
@@ -223,7 +224,7 @@ function sendImpersonationPullRequestStatus(push, foundSpoofing) {
     'path': formatStatusAPIURLPath(statusAPIURL.path, sha),
     'method': 'POST',
     'headers' : {
-      'Authorization' : 'token ' + config.github.accessToken,
+      'Authorization' : 'token ' + user.providerData.accessToken,
       'Accept': 'application/vnd.github.v3+json'
     }
   };
@@ -273,7 +274,7 @@ function sendImpersonationPullRequestStatus(push, foundSpoofing) {
  * Processing each commit within a Push.
  * Using promises so the pull request status is not set until after each commit has been processed.
  ***/
-function processCommits(push) {
+function processCommits(user, push) {
   return new Promise(function(fulfill, reject) {
     var pusher = push.payload.pusher;
     var commits = push.payload.commits;
@@ -291,7 +292,7 @@ function processCommits(push) {
         'path': formatStatusAPIURLPath(statusAPIURL.path, commits[commitCounter].id),
         'method': 'POST',
         'headers' : {
-          'Authorization' : 'token ' + config.github.accessToken,
+          'Authorization' : 'token ' + user.providerData.accessToken,
           'Accept': 'application/vnd.github.v3+json'
         }
       };
@@ -301,9 +302,9 @@ function processCommits(push) {
       //Comparing pusher email with commiter email
       if(commits[commitCounter].committer.email !== pusher.email) {
         foundSpoofing = true;
-        setImpersonationCommitStatus(push, options, commitCounter, true).then(commitProcessed(--commitsRemainingToProcess, foundSpoofing, fulfill));
+        setImpersonationCommitStatus(user, push, options, commitCounter, true).then(commitProcessed(--commitsRemainingToProcess, foundSpoofing, fulfill));
       } else {
-        setImpersonationCommitStatus(push, options, commitCounter, false).then(commitProcessed(--commitsRemainingToProcess, foundSpoofing, fulfill));
+        setImpersonationCommitStatus(user, push, options, commitCounter, false).then(commitProcessed(--commitsRemainingToProcess, foundSpoofing, fulfill));
       }
     }
   });
@@ -323,9 +324,15 @@ function commitProcessed(commitsRemainingToProcess, foundSpoofing, fulfill) {
  * A Push event was recieved *
  ***/
 exports.pushValidator = function (req, res) {
+  if(req.body.zen) {
+    // Ping event
+    return res.status(200).send({'message' : 'I am zen too' });
+  }
+
+  var user = req.profile;
+
   var push = new Push();
   push.payload = req.body;
-
 
   if(!host) {
     host = req.headers.host;
@@ -339,11 +346,11 @@ exports.pushValidator = function (req, res) {
       logger.error(err);
       return res.send(400, {'message' : err });
     } else {
-      processCommits(push).then(function(foundSpoofing) {
+      processCommits(user, push).then(function(foundSpoofing) {
         logger.debug('impersonation.server.controller.pushValidator - All commits have been processed');
-        setImpersonationPullRequestStatus(push, foundSpoofing);
+        setImpersonationPullRequestStatus(user, push, foundSpoofing);
         return res.status(200).send({'message' : 'OK' });
-    });
+      });
     }
   });
 };
@@ -373,6 +380,8 @@ exports.getPullRequestCommits = function (req, res) {
   logger.debug('impersonation.server.controller.getPullRequestCommitsWithPusher - Request for commits of a Pull Request', req.body);
 
   var commitsAPIURL = url.parse(req.body.commitsAPIURL);
+
+
 
   var options = {
     'host': commitsAPIURL.host,

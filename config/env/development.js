@@ -15,6 +15,26 @@ module.exports = {
     // Enable mongoose debug mode
     debug: process.env.MONGODB_DEBUG || false
   },
+  webhookList : [
+    { 'label': 'Impersonation Checker',
+      'name' : 'web',
+      'active': true,
+      'events': ['push'],
+      'config': {
+        'url': 'http://192.168.231.1:3000/api/impersonation/pushValidator',
+        'content_type': 'json'
+      }
+    },
+    { 'label': 'Deployment Orchestrator',
+      'name' : 'web',
+      'active': true,
+      'events': ['deployment'],
+      'config': {
+        'url': 'http://192.168.231:3000/api/impersonation/pushValidator',
+        'content_type': 'json'
+      }
+    }
+  ],
   log: {
     // Can specify one of 'combined', 'common', 'dev', 'short', 'tiny'
     format: 'dev',
@@ -55,7 +75,7 @@ module.exports = {
     authorizationURL: 'https://octoalaindemo/login/oauth/authorize',
     tokenURL: 'https://octoalaindemo/login/oauth/access_token',
     userProfileURL : 'https://octoalaindemo/api/v3/user',
-    scope : ['user', 'repo', 'notifications', 'admin:org'],
+    scope : ['user', 'repo', 'notifications', 'admin:org', 'admin:org_hook'],
 		githubHost: 'octoalaindemo'
   },
   paypal: {

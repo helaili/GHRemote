@@ -27,13 +27,13 @@ exports.invokeRolesPolicies = function () {
   }, {
     roles: ['guest', 'user', 'admin'],
     allows: [{
-      resources: '/api/impersonation/pushValidator',
+      resources: '/api/impersonation/pushValidator/:userId',
       permissions: ['post']
     }, {
-      resources: '/api/impersonation/getCommit',
+      resources: '/api/impersonation/getCommit/:userId',
       permissions: ['post']
     },{
-      resources: '/api/impersonation/getPullRequestCommits',
+      resources: '/api/impersonation/getPullRequestCommits/:userId',
       permissions: ['post']
     }
   ]
