@@ -11,10 +11,10 @@ module.exports = function (app) {
   app.route('/api/impersonation/pushValidator/:userId').all(impersonationPolicy.isAllowed)
     .post(impersonation.pushValidator);
 
-  app.route('/api/impersonation/getCommit/:userId').all(impersonationPolicy.isAllowed)
+  app.route('/api/impersonation/getCommit').all(impersonationPolicy.isAllowed)
     .post(impersonation.getCommit);
 
-  app.route('/api/impersonation/getPullRequestCommits/:userId').all(impersonationPolicy.isAllowed)
+  app.route('/api/impersonation/getPullRequestCommits').all(impersonationPolicy.isAllowed)
     .post(impersonation.getPullRequestCommits);
 
   // Finish by binding the user middleware

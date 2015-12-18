@@ -10,12 +10,8 @@ angular.module('gitHubAPI').config(['$stateProvider',
         url: '/gitHubAPI',
         template: '<ui-view/>'
       })
-      .state('gitHubAPI.list', {
-        url: '',
-        templateUrl: 'modules/gitHubAPI/client/views/list-gitHubAPI.client.view.html'
-      })
       .state('gitHubAPI.call', {
-        url: '/call',
+        url: '',
         templateUrl: 'modules/gitHubAPI/client/views/call-gitHubAPI.client.view.html',
         data: {
           roles: ['user', 'admin']

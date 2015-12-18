@@ -30,10 +30,10 @@ exports.invokeRolesPolicies = function () {
       resources: '/api/impersonation/pushValidator/:userId',
       permissions: ['post']
     }, {
-      resources: '/api/impersonation/getCommit/:userId',
+      resources: '/api/impersonation/getCommit',
       permissions: ['post']
     },{
-      resources: '/api/impersonation/getPullRequestCommits/:userId',
+      resources: '/api/impersonation/getPullRequestCommits',
       permissions: ['post']
     }
   ]

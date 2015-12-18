@@ -20,7 +20,7 @@ angular.module('core').factory('HomeServices', ['$resource',
       },
       getWebhooks : {
         method : 'GET',
-      	url : '/api/home/getWebhooks',
+      	url : 'api/home/getWebhooks',
         isArray: true
       }
     });

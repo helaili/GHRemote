@@ -11,12 +11,6 @@ angular.module('gitHubAPI').run(['Menus',
       roles: ['*']
     });
 
-    // Add the dropdown list item
-    Menus.addSubMenuItem('topbar', 'gitHubAPI', {
-      title: 'List GitHub API',
-      state: 'gitHubAPI.list'
-    });
-
     // Add the dropdown call item
     Menus.addSubMenuItem('topbar', 'gitHubAPI', {
       title: 'Call GitHub API',

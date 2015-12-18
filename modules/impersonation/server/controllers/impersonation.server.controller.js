@@ -100,26 +100,7 @@ function setImpersonationCommitStatus(push, options, commitIndex, foundSpoofing)
             fulfill(foundSpoofing);
           }
         });
-
-        /*
-        // Weird but otherwhise the updated field was 'field' i.e. the variable name as opposed to the variable value.
-        var field = {};
-        field['payload.commits.' + commitIndex + '.spoofedStatusReported'] = true;
-        field['payload.commits.' + commitIndex + '.spoofedComment'] = foundSpoofing;
-
-        // Updating the commit in the DB so we know the status was reported
-        mongoose.connection.collections.pushes.update({'_id' : push._id}, {'$set' : field}, function (err, res) {
-          if(err) {
-            logger.error(err);
-          } else {
-            logger.debug('impersonation.server.controller.setImpersonationCommitStatus - Persisted the commit report event', res.result);
-          }
-        });
-        */
-
       });
-
-
     });
 
     statusAPIRequest.on('error', function(e) {
@@ -302,9 +283,9 @@ function processCommits(user, push) {
       //Comparing pusher email with commiter email
       if(commits[commitCounter].committer.email !== pusher.email) {
         foundSpoofing = true;
-        setImpersonationCommitStatus(user, push, options, commitCounter, true).then(commitProcessed(--commitsRemainingToProcess, foundSpoofing, fulfill));
+        setImpersonationCommitStatus(push, options, commitCounter, true).then(commitProcessed(--commitsRemainingToProcess, foundSpoofing, fulfill));
       } else {
-        setImpersonationCommitStatus(user, push, options, commitCounter, false).then(commitProcessed(--commitsRemainingToProcess, foundSpoofing, fulfill));
+        setImpersonationCommitStatus(push, options, commitCounter, false).then(commitProcessed(--commitsRemainingToProcess, foundSpoofing, fulfill));
       }
     }
   });
@@ -328,15 +309,14 @@ exports.pushValidator = function (req, res) {
     // Ping event
     return res.status(200).send({'message' : 'I am zen too' });
   }
+  if(!host) {
+    host = req.headers.host;
+  }
 
   var user = req.profile;
 
   var push = new Push();
   push.payload = req.body;
-
-  if(!host) {
-    host = req.headers.host;
-  }
 
   logger.debug('Recieving a push event', push.payload);
 
@@ -380,8 +360,11 @@ exports.getPullRequestCommits = function (req, res) {
   logger.debug('impersonation.server.controller.getPullRequestCommitsWithPusher - Request for commits of a Pull Request', req.body);
 
   var commitsAPIURL = url.parse(req.body.commitsAPIURL);
+  var user = req.profile;
 
-
+  console.log('---------------');
+  console.log(user);
+  console.log('---------------');
 
   var options = {
     'host': commitsAPIURL.host,
