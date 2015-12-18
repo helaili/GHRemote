@@ -139,12 +139,12 @@ angular.module('issues').controller('IssuesController', ['$scope', '$stateParams
       $scope.repositoryName = $stateParams.repositoryName;
       $scope.repositoryOwner = $stateParams.repositoryOwner;
 
-      $scope.issue = Issues.read({
+      Issues.read({
         repositoryName : $stateParams.repositoryName,
         repositoryOwner : $stateParams.repositoryOwner,
         issueId : $stateParams.issueNumber
       }, function(response) {
-        console.log(response);
+        $scope.issue = response;
       });
     };
   }

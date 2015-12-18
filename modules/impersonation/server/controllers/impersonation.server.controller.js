@@ -360,7 +360,7 @@ exports.getPullRequestCommits = function (req, res) {
   logger.debug('impersonation.server.controller.getPullRequestCommitsWithPusher - Request for commits of a Pull Request', req.body);
 
   var commitsAPIURL = url.parse(req.body.commitsAPIURL);
-  var user = req.profile;
+  var user = req.user;
 
   console.log('---------------');
   console.log(user);
@@ -371,7 +371,7 @@ exports.getPullRequestCommits = function (req, res) {
     'path': commitsAPIURL.path,
     'method': 'GET',
     'headers' : {
-      'Authorization' : 'token ' + config.github.accessToken,
+      'Authorization' : 'token ' + user.providerData.accessToken,
       'Accept': 'application/vnd.github.v3+json'
     }
   };
