@@ -25,12 +25,12 @@ module.exports = {
         'content_type': 'json'
       }
     },
-    { 'label': 'Deployment Orchestrator',
+    { 'label': 'Deployment Manager',
       'name' : 'web',
       'active': true,
       'events': ['deployment'],
       'config': {
-        'url': 'http://192.168.231:3000/api/impersonation/pushValidator',
+        'url': 'http://192.168.231:3000/api/deployment/deploy',
         'content_type': 'json'
       }
     }

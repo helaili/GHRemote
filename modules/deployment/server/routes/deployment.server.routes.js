@@ -13,6 +13,12 @@ module.exports = function (app) {
   app.route('/api/deployment/deploy').all(deploymentPolicy.isAllowed)
     .post(deployment.deploy);
 
+  app.route('/api/deployment/create').all(deploymentPolicy.isAllowed)
+      .post(deployment.create);
+
+  app.route('/api/deployment/list').all(deploymentPolicy.isAllowed)
+      .post(deployment.list);
+
   // Finish by binding the user middleware
   app.param('userId', users.userByID);
 };

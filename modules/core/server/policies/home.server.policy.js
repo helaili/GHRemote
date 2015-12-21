@@ -29,7 +29,10 @@ exports.invokeRolesPolicies = function () {
     }, {
       resources: '/api/home/addWebhook',
       permissions: ['post']
-    }, {
+    }]
+  }, {
+    roles: ['guest', 'user', 'admin'],
+    allows: [{
       resources: '/api/home/getWebhooks',
       permissions: ['get']
     }]

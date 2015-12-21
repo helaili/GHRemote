@@ -4,27 +4,25 @@
   </div>
   <div class="col-md-12">
     <form name="gitHubAPIForm" class="form-horizontal" ng-submit="call(gitHubAPIForm.$valid)" novalidate>
-      <fieldset>
         <div class="form-group" show-errors>
-          <label for="endpoint">Enpoint</label>
+          <label class="control-label" for="endpoint">Enpoint</label>
           <input name="endpoint" type="text" ng-model="endpoint" id="endpoint" class="form-control" placeholder="Enpoint" required>
           <div ng-messages="gitHubAPIForm.endpoint.$error" role="alert">
             <p class="help-block error-text" ng-message="required">gitHubAPI endpoint is required.</p>
           </div>
         </div>
         <div class="form-group">
-          <label>Result</label>
+          <input type="submit" class="btn btn-default">
+        </div>
+        <div class="form-group" ng-if="callResult">
+          <label class="control-label">Result</label>
           <p>
             <pretty-json json="callResult"></pretty-json>
           </p>
         </di>
-        <div class="form-group">
-          <input type="submit" class="btn btn-default">
-        </div>
         <div ng-show="error" class="text-danger">
           <strong ng-bind="error"></strong>
         </div>
-      </fieldset>
     </form>
   </div>
 </section>

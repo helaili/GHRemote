@@ -21,16 +21,18 @@ exports.invokeRolesPolicies = function () {
   }, {
     roles: ['user'],
     allows: [{
-      resources: '/api/deployment',
-      permissions: ['get', 'post']
+      resources: '/api/deployment/create',
+      permissions: ['post']
+    }, {
+      resources: '/api/deployment/list',
+      permissions: ['post']
     }]
   }, {
-    roles: ['guest'],
+    roles: ['admin', 'user', 'guest'],
     allows: [{
       resources: '/api/deployment/deploy',
       permissions: ['post']
-    }
-  ]
+    }]
   }]);
 };
 

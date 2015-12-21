@@ -4,25 +4,6 @@ angular.module('core').controller('HomeController', ['$scope', '$http', '$filter
   function ($scope, $http, $filter, Authentication, HomeServices) {
     // This provides Authentication context.
     $scope.authentication = Authentication;
-    /*$scope.webhookList = [
-      { 'label': 'Impersonation Checker',
-        'name' : 'web',
-        'active': true,
-        'events': ['push', 'pull_request'],
-        'config': {
-          'url': 'http://example.com/webhook',
-          'content_type': 'json'
-        }
-      },
-      { 'label': 'Deployment Orchestrator',
-        'name' : 'web',
-        'active': true,
-        'events': ['deploy'],
-        'config': {
-          'url': 'http://example.com/webhook',
-          'content_type': 'json'
-        }
-      }];*/
     HomeServices.getWebhooks(function(response) {
         $scope.webhookList = response;
         $scope.webhookSelection = $scope.webhookList[0];

@@ -163,7 +163,7 @@ function setImpersonationPullRequestStatus(user, push, foundSpoofing) {
           } else {
             logger.debug('impersonation.server.controller.setImpersonationPullRequestStatus - Retrieved spoofed commit count', result);
 
-            if(result && result[0] && result[0].spoofedCount) {
+            if(result.length > 0) {
               if(result[0].spoofedCount > 0) {
                 logger.debug('impersonation.server.controller.setImpersonationPullRequestStatus - Pull Request is spoofed');
                 sendImpersonationPullRequestStatus(user, push, true);
@@ -172,6 +172,7 @@ function setImpersonationPullRequestStatus(user, push, foundSpoofing) {
                 sendImpersonationPullRequestStatus(user, push, false);
               }
             } else {
+              logger.debug('impersonation.server.controller.setImpersonationPullRequestStatus - No previous commit');
               sendImpersonationPullRequestStatus(user, push, true);
             }
           }
@@ -357,14 +358,10 @@ exports.getCommit = function (req, res) {
  ***/
 
 exports.getPullRequestCommits = function (req, res) {
-  logger.debug('impersonation.server.controller.getPullRequestCommitsWithPusher - Request for commits of a Pull Request', req.body);
+  logger.debug('impersonation.server.controller.getPullRequestCommits - Request for commits of a Pull Request', req.body);
 
   var commitsAPIURL = url.parse(req.body.commitsAPIURL);
   var user = req.user;
-
-  console.log('---------------');
-  console.log(user);
-  console.log('---------------');
 
   var options = {
     'host': commitsAPIURL.host,
@@ -378,9 +375,9 @@ exports.getPullRequestCommits = function (req, res) {
 
   var statusAPIRequest = https.request(options, function(statusAPIResponse) {
     var responseBodyStr = '';
-    logger.debug('impersonation.server.controller.getPullRequestCommitsWithPusher - HTTP target : ' + options.path);
-    logger.debug('impersonation.server.controller.getPullRequestCommitsWithPusher - HTTP status : ' + statusAPIResponse.statusCode);
-    logger.debug('impersonation.server.controller.getPullRequestCommitsWithPusher - HTTP headers', statusAPIResponse.headers);
+    logger.debug('impersonation.server.controller.getPullRequestCommits - HTTP target : ' + options.path);
+    logger.debug('impersonation.server.controller.getPullRequestCommits - HTTP status : ' + statusAPIResponse.statusCode);
+    logger.debug('impersonation.server.controller.getPullRequestCommits - HTTP headers', statusAPIResponse.headers);
 
     statusAPIResponse.setEncoding('utf8');
 
@@ -394,15 +391,15 @@ exports.getPullRequestCommits = function (req, res) {
       for(var commitIndex in commitArray) {
         idArray.push(commitArray[commitIndex].sha);
       }
-      logger.debug('impersonation.server.controller.getPullRequestCommitsWithPusher - Commit IDs ' + idArray);
+      logger.debug('impersonation.server.controller.getPullRequestCommits - Commit IDs ' + idArray);
 
       //Got my array of ids, now I need to check wheter one of those SHA was spoofed
       Commit.find({'id' : {'$in':  idArray}}, function(err, result) {
         if (err) {
-          logger.error('impersonation.server.controller.getPullRequestCommitsWithPusher - Problem retrieving the commits on this Pull Request', err);
+          logger.error('impersonation.server.controller.getPullRequestCommits - Problem retrieving the commits on this Pull Request', err);
           return res.status(400).send({'message' : err });
         } else {
-          logger.debug('impersonation.server.controller.getPullRequestCommitsWithPusher - Retrieved ' + result.length + ' commits.');
+          logger.debug('impersonation.server.controller.getPullRequestCommits - Retrieved ' + result.length + ' commits.');
           return res.status(200).send(result);
         }
       });
@@ -410,7 +407,7 @@ exports.getPullRequestCommits = function (req, res) {
   });
 
   statusAPIRequest.on('error', function(e) {
-    logger.error('impersonation.server.controller.getPullRequestCommitsWithPusher - Problem retrieving commit status on ' + commitsAPIURL, e);
+    logger.error('impersonation.server.controller.getPullRequestCommits - Problem retrieving commit status on ' + commitsAPIURL, e);
   });
 
   statusAPIRequest.end();

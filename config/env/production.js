@@ -28,12 +28,12 @@ module.exports = {
         'content_type': 'json'
       }
     },
-    { 'label': 'Deployment Orchestrator',
+    { 'label': 'Deployment Manager',
       'name' : 'web',
       'active': true,
       'events': ['deployment'],
       'config': {
-        'url': 'https://ghremote.octodemo.com/api/impersonation/pushValidator',
+        'url': 'https://ghremote.octodemo.com/api/deployment/deploy',
         'content_type': 'json'
       }
     }

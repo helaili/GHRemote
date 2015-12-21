@@ -1,0 +1,51 @@
+<section ng-controller="DeploymentController">
+  <div class="page-header">
+    <h1>Request New Deployment</h1>
+  </div>
+  <div class="col-md-12">
+    <form name="lisDeploymentForm" class="form-horizontal" ng-submit="requestDeployment(requestDeploymentForm.$valid)" novalidate>
+      <div class="form-group" show-errors>
+        <label class="control-label col-sm-2" for="repository">Repository</label>
+        <div class="col-sm-6">
+          <input type="text" name="repository" ng-model="asyncRepositorySelected" placeholder="Repository"
+              uib-typeahead="repository as repository.full_name for repository in getRepositories($viewValue)"
+              typeahead-loading="loadingRepositories" typeahead-no-results="noRepositorytResults"
+              class="form-control" required>
+          <i ng-show="loadingRepositories" class="glyphicon glyphicon-refresh"></i>
+          <div ng-show="noRepositorytResults">
+            <i class="glyphicon glyphicon-remove"></i> No Results Found
+          </div>
+        </div>
+        <div class="col-sm-2">
+          <button type="button" id="addWebHookToRepo" data-loading-text="Loading..." ng-disabled="noRepositorytResults" class="btn btn-primary form-control"
+                  ng-click="listDeployment(asyncRepositorySelected)" autocomplete="off">Get Deployments</button>
+        </div>
+      </div>
+    </form>
+
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Environment</th>
+          <th>Task</th>
+          <th>Reference</th>
+          <th>Description</th>
+          <th>Creator</th>
+          <th>Created</th>
+          <th>State</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="deployment in deployments">
+          <td>{{deployment.environment}}</td>
+          <td>{{deployment.task}}</td>
+          <td>{{deployment.ref}}</td>
+          <td>{{deployment.description}}</td>
+          <td>{{deployment.creator.login}}</td>
+          <td>{{deployment.created_at}}</td>
+          <td>{{deployment.lastState}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
