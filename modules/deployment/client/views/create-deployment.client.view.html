@@ -1,0 +1,76 @@
+<section ng-controller="DeploymentController">
+  <div class="page-header">
+    <h1>Request New Deployment</h1>
+  </div>
+  <div class="col-md-12">
+    <form name="createDeploymentForm" class="form-horizontal" ng-submit="createDeployment(createDeploymentForm.$valid)" novalidate>
+      <div class="form-group" show-errors>
+        <label class="control-label col-sm-2" for="repository">Repository</label>
+        <div class="col-sm-6">
+          <input type="text" name="repository" ng-model="asyncRepositorySelected" placeholder="Repository"
+              uib-typeahead="repository as repository.full_name for repository in getRepositories($viewValue)"
+              typeahead-loading="loadingRepositories" typeahead-no-results="noRepositorytResults"
+              class="form-control" required>
+          <i ng-show="loadingRepositories" class="glyphicon glyphicon-refresh"></i>
+          <div ng-show="noRepositorytResults">
+            <i class="glyphicon glyphicon-remove"></i> No Results Found
+          </div>
+        </div>
+      </div>
+      <div class="form-group" show-errors>
+        <label class="control-label col-sm-2" for="reference">Reference</label>
+        <div class="col-sm-6">
+          <input type="text" name="reference" ng-model="request.ref" placeholder="Branch, Tag or SHA" class="form-control" required>
+        </div>
+      </div>
+      <div class="form-group" show-errors>
+        <label class="control-label col-sm-2" for="task">Task</label>
+        <div class="col-sm-6">
+          <input type="text" name="task" ng-model="request.task" placeholder="Environment" class="form-control">
+        </div>
+      </div>
+      <div class="form-group" show-errors>
+        <label class="control-label col-sm-2" for="payload">Payload</label>
+        <div class="col-sm-6">
+          <input type="text" name="payload" ng-model="request.payload" placeholder="JSON Payload" class="form-control">
+        </div>
+      </div>
+      <div class="form-group" show-errors>
+        <label class="control-label col-sm-2" for="environment">Environment</label>
+        <div class="col-sm-6">
+          <input type="text" name="environment" ng-model="request.environment" placeholder="Environment" class="form-control">
+        </div>
+      </div>
+      <div class="form-group" show-errors>
+        <label class="control-label col-sm-2" for="required_contexts_str">Required contexts</label>
+        <div class="col-sm-6">
+          <input type="text" name="required_contexts_str" ng-model="required_contexts_str" placeholder="Comma-separated list of contexts" class="form-control">
+        </div>
+      </div>
+      <div class="form-group" show-errors>
+        <label class="control-label col-sm-2" for="description">Description</label>
+        <div class="col-sm-6">
+          <input type="text" name="description" ng-model="request.description" placeholder="Description" class="form-control">
+        </div>
+      </div>
+      <div class="form-group" show-errors>
+        <label class="control-label col-sm-2" for="auto-merge">Auto Merge</label>
+        <div class="col-sm-6">
+          <input type="checkbox" name="auto-merge" ng-model="request.auto_merge" placeholder="Automerge" class="form-control">
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="control-label col-sm-2"></div>
+        <div class="col-sm-6">
+          <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
+      </div>
+      <div ng-show="error" class="text-danger">
+        <strong ng-bind="error"></strong>
+      </div>
+      <div ng-show="success" class="text-center text-success">
+        <strong ng-bind="success"></strong>
+      </div>
+    </form>
+  </div>
+</section>
