@@ -36,7 +36,56 @@ winston.loggers.add('Deployment', {
 exports.deploy = function (req, res) {
   logger.debug('deployment.server.controller.deploy - A deployment has been requested', req.body);
 
-  return res.status(200).send({'message' : 'ok' });
+  if(req.body.zen) {
+    // Ping event
+    return res.status(200).send({'message' : 'I am zen too' });
+  }
+
+  var user = req.profile;
+
+  var deploymentAPIURL = url.parse(req.body.deployment.statuses_url);
+
+  var options = {
+    'host': deploymentAPIURL.host,
+    'path': deploymentAPIURL.path,
+    'method': 'POST',
+    'headers' : {
+      'Authorization' : 'token ' + user.providerData.accessToken,
+      'Accept': 'application/vnd.github.v3+json'
+    }
+  };
+
+  //YES!, enconding the encoded url - Angular weirdness here? 
+  var postData = {
+    "state": "pending",
+    "target_url": 'http://'.concat(req.headers.host).concat('/deployment/view/').concat(encodeURIComponent(encodeURIComponent(req.body.deployment.statuses_url))),
+    "description": "Working on it!"
+  };
+
+  var apiRequest = https.request(options, function(apiResponse) {
+    var responseBodyStr = '';
+    logger.debug('deployment.server.controller.deploy - HTTP target : ' + options.path);
+    logger.debug('deployment.server.controller.deploy - HTTP status : ' + apiResponse.statusCode);
+    logger.debug('deployment.server.controller.deploy - HTTP headers', apiResponse.headers);
+
+    apiResponse.setEncoding('utf8');
+
+    apiResponse.on('data', function (chunk) {
+      responseBodyStr = responseBodyStr.concat(chunk);
+    });
+
+    apiResponse.on('end', function() {
+      return res.status(200).send(responseBodyStr);
+    });
+  });
+
+  apiRequest.on('error', function(e) {
+    logger.error('deployment.server.controller.deploy - Problem setting deployment status on ' + deploymentAPIURL, e);
+    return res.status(400).send(e);
+  });
+
+  apiRequest.write(JSON.stringify(postData));
+  apiRequest.end();
 };
 
 /***
@@ -135,14 +184,11 @@ exports.list = function (req, res) {
   apiRequest.end();
 };
 
+exports.status = function (req, res) {
+    logger.debug('deployment.server.controller.status - URL for status of deployment ', req.body);
 
-
-
-function getDeploymentStatus(user, deployment) {
-  return new Promise(function(fulfill, reject) {
-    logger.debug('deployment.server.controller.getDeploymentStatus', deployment);
-
-    var deploymentAPIURL = url.parse(deployment.statuses_url);
+    var user = req.user;
+    var deploymentAPIURL = url.parse(decodeURIComponent(req.body.deploymentAPIURL));
 
     var options = {
       'host': deploymentAPIURL.host,
@@ -157,9 +203,9 @@ function getDeploymentStatus(user, deployment) {
 
     var apiRequest = https.request(options, function(apiResponse) {
       var responseBodyStr = '';
-      logger.debug('deployment.server.controller.getDeploymentStatus - HTTP target : ' + options.path);
-      logger.debug('deployment.server.controller.getDeploymentStatus - HTTP status : ' + apiResponse.statusCode);
-      logger.debug('deployment.server.controller.getDeploymentStatus - HTTP headers', apiResponse.headers);
+      logger.debug('deployment.server.controller.status - HTTP target : ' + options.path);
+      logger.debug('deployment.server.controller.status - HTTP status : ' + apiResponse.statusCode);
+      logger.debug('deployment.server.controller.status - HTTP headers', apiResponse.headers);
 
       apiResponse.setEncoding('utf8');
 
@@ -168,15 +214,14 @@ function getDeploymentStatus(user, deployment) {
       });
 
       apiResponse.on('end', function() {
-        var statusObject = JSON.parse(responseBodyStr);
+        return res.status(200).send(responseBodyStr);
       });
     });
 
     apiRequest.on('error', function(e) {
-      logger.error('deployment.server.controller.getDeploymentStatus - Problem retrieving deployment status on ' + deploymentAPIURL, e);
-      return null;
+      logger.error('deployment.server.controller.list - Problem retrieving commit status on ' + deploymentAPIURL, e);
+      return res.status(400).send(e);
     });
 
     apiRequest.end();
-  });
-}
+};

@@ -49,9 +49,22 @@ angular.module('deployment').controller('DeploymentController', ['$scope', '$sta
 
     $scope.listDeployment = function () {
       DeploymentServices.list($scope.asyncRepositorySelected, function(response) {
-        $scope.deployments = response;
+        var deployments = response;
+        for(var deploymentIndex = 0; deploymentIndex < deployments.length; deploymentIndex++) {
+          //Need to encode the URL otherwise angular is getting confused and calls the controller twice
+          deployments[deploymentIndex].statuses_url_str = encodeURIComponent(deployments[deploymentIndex].statuses_url);
+        }
+        $scope.deployments = deployments;
+
       }, function(error) {
         //console.log(error);
+      });
+    };
+
+    $scope.getDeploymentStatus = function() {
+      DeploymentServices.status({'deploymentAPIURL' : $stateParams.deploymentAPIURL}, function(response) {
+        $scope.statuses = response;
+        console.log(response);
       });
     };
   }

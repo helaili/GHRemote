@@ -30,7 +30,7 @@ module.exports = {
       'active': true,
       'events': ['deployment'],
       'config': {
-        'url': 'http://192.168.231:3000/api/deployment/deploy',
+        'url': 'http://192.168.231.1:3000/api/deployment/deploy',
         'content_type': 'json'
       }
     }

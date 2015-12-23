@@ -1,6 +1,6 @@
 <section ng-controller="DeploymentController">
   <div class="page-header">
-    <h1>Request New Deployment</h1>
+    <h1>Existing Deployments</h1>
   </div>
   <div class="col-md-12">
     <form name="lisDeploymentForm" class="form-horizontal" ng-submit="requestDeployment(requestDeploymentForm.$valid)" novalidate>
@@ -26,24 +26,24 @@
     <table class="table table-striped">
       <thead>
         <tr>
+          <th>ID</th>
           <th>Environment</th>
           <th>Task</th>
           <th>Reference</th>
           <th>Description</th>
           <th>Creator</th>
           <th>Created</th>
-          <th>State</th>
         </tr>
       </thead>
       <tbody>
         <tr ng-repeat="deployment in deployments">
+          <td><a ui-sref="deployment.view({deploymentAPIURL : deployment.statuses_url_str})">{{deployment.id}}</a></td>
           <td>{{deployment.environment}}</td>
           <td>{{deployment.task}}</td>
           <td>{{deployment.ref}}</td>
           <td>{{deployment.description}}</td>
           <td>{{deployment.creator.login}}</td>
           <td>{{deployment.created_at}}</td>
-          <td>{{deployment.lastState}}</td>
         </tr>
       </tbody>
     </table>

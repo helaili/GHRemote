@@ -1,0 +1,27 @@
+<section ng-controller="DeploymentController" ng-init="getDeploymentStatus()">
+  <div class="page-header">
+    <h1>Deployment Details</h1>
+  </div>
+  <div class="col-md-12">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Description</th>
+          <th>State</th>
+          <th>Creator</th>
+          <th>Created</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="status in statuses">
+          <td>{{status.id}}</td>
+          <td>{{status.description}}</td>
+          <td>{{status.state}}</td>
+          <td>{{status.creator.login}}</td>
+          <td>{{status.created_at}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>

@@ -25,7 +25,7 @@
         <div class="form-group">
           <label for="webhookSelect" class="col-sm-2 control-label">Webhook</label>
           <div class="col-sm-6">
-            <select ng-model="webhookSelection" class="form-control" name="webhookSelect" id="webhookSelect" ng-options="option.label for option in webhookList"></select>
+            <select ng-model="data.webhookSelection" class="form-control" name="webhookSelect" id="webhookSelect" ng-options="option.label for option in webhookList"></select>
           </div>
         </div>
         <div class="form-group">
@@ -64,4 +64,12 @@
         </div>
       </form>
     </p>
+  </div>
+  <div ng-show="errorMessage" class="text-danger">
+    <strong ng-bind="errorMessage"></strong>
+  </div>
+  <div ng-show="successMessage" class="text-center text-success">
+    <strong ng-bind="successMessage"></strong>
+  </div>
+
 </section>

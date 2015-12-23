@@ -11,7 +11,7 @@ angular.module('deployment').config(['$stateProvider',
         template: '<ui-view/>'
       })
       .state('deployment.create', {
-        url: '',
+        url: '/create',
         templateUrl: 'modules/deployment/client/views/create-deployment.client.view.html',
         data: {
           roles: ['user', 'admin']
@@ -22,6 +22,13 @@ angular.module('deployment').config(['$stateProvider',
         templateUrl: 'modules/deployment/client/views/list-deployment.client.view.html',
         data: {
           roles: ['user', 'admin']
+        }
+      })
+      .state('deployment.view', {
+        url: '/view/{deploymentAPIURL}',
+        templateUrl: 'modules/deployment/client/views/view-deployment.client.view.html',
+        data: {
+          roles: ['user', 'admin', 'guest']
         }
       });
   }

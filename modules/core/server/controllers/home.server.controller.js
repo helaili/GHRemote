@@ -74,6 +74,9 @@ function callGitHubApi(res, user, apiPath) {
   apiRequest.end();
 }
 
+/***
+ * Register a webhook in an org or a repo
+ ***/
 exports.addWebhook = function(req, res) {
   logger.debug('home.server.controller.addWebhook - Post Data : ', req.body);
 
@@ -139,6 +142,9 @@ exports.addWebhook = function(req, res) {
 
 };
 
+/***
+ * Retrieve the list of available webooks configured in config/env/<env>.js
+ ***/
 exports.getWebhooks = function(req, res) {
   res.status(200).send(config.webhookList);
 };

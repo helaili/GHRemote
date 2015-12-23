@@ -4,12 +4,16 @@ angular.module('core').controller('HomeController', ['$scope', '$http', '$filter
   function ($scope, $http, $filter, Authentication, HomeServices) {
     // This provides Authentication context.
     $scope.authentication = Authentication;
+    $scope.data = {};
+
     HomeServices.getWebhooks(function(response) {
         $scope.webhookList = response;
-        $scope.webhookSelection = $scope.webhookList[0];
+        $scope.data.webhookSelection = $scope.webhookList[0];
     });
 
 
+    $scope.errorMessage = undefined;
+    $scope.successMessage = undefined;
 
     $scope.organizationsPromise = undefined;
     $scope.repositoriesPromise = undefined;
@@ -37,16 +41,32 @@ angular.module('core').controller('HomeController', ['$scope', '$http', '$filter
     };
 
     $scope.addWebhook = function(target, type) {
+      $scope.errorMessage = undefined;
+      $scope.successMessage = undefined;
       //Make sure we have a selection in the dropdown and not a partial string
       if(target &&  typeof target === 'object') {
         var data = {
-          'webhook' : $scope.webhookSelection,
+          'webhook' : $scope.data.webhookSelection,
           'targetType' : type,
           'target' : target
         };
 
         HomeServices.addWebhook(data, function(response) {
-            return response;
+          if(response.id) {
+            //webhook deployment succeeded
+            $scope.successMessage = 'Sweet success!';
+          } else {
+            $scope.errorMessage = '';
+
+            if(response.errors) {
+              for(var errorIndex = 0; errorIndex < response.errors.length; errorIndex++) {
+                //console.log(response.errors[errorIndex].message);
+                $scope.errorMessage = $scope.errorMessage.concat(response.errors[errorIndex].message).concat(' ');
+              }
+            } else {
+              $scope.errorMessage = 'Unknown error';
+            }
+          }
         });
       }
     };

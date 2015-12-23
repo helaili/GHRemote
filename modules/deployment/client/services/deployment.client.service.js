@@ -11,6 +11,11 @@ angular.module('deployment').factory('DeploymentServices', ['$resource',
         method : 'POST',
       	url : 'api/deployment/list',
         isArray: true
+      },
+      status  : {
+        method : 'POST',
+      	url : 'api/deployment/status',
+        isArray: true
       }
     });
   }

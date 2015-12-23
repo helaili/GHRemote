@@ -10,7 +10,7 @@ var deploymentPolicy = require('../policies/deployment.server.policy'),
 //http://192.168.231.1:300/api/deployment/deploy
 
 module.exports = function (app) {
-  app.route('/api/deployment/deploy').all(deploymentPolicy.isAllowed)
+  app.route('/api/deployment/deploy/:userId').all(deploymentPolicy.isAllowed)
     .post(deployment.deploy);
 
   app.route('/api/deployment/create').all(deploymentPolicy.isAllowed)
@@ -18,6 +18,9 @@ module.exports = function (app) {
 
   app.route('/api/deployment/list').all(deploymentPolicy.isAllowed)
       .post(deployment.list);
+
+  app.route('/api/deployment/status').all(deploymentPolicy.isAllowed)
+      .post(deployment.status);
 
   // Finish by binding the user middleware
   app.param('userId', users.userByID);
