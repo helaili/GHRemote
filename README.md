@@ -10,6 +10,7 @@
 export GITHUB_ID=<your id>
 export GITHUB_SECRET=<your secret>
 ```
+- Make sure ruby and sass are in your ```PATH```
 - ```cd GHRemote```
 - Execute ```./scripts/generate-ssl-certs.sh``` and answer the questions
 - ```grunt prod```
