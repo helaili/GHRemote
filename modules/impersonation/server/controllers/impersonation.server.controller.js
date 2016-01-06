@@ -173,7 +173,7 @@ function setImpersonationPullRequestStatus(user, push, foundSpoofing) {
               }
             } else {
               logger.debug('impersonation.server.controller.setImpersonationPullRequestStatus - No previous commit');
-              sendImpersonationPullRequestStatus(user, push, true);
+              sendImpersonationPullRequestStatus(user, push, false);
             }
           }
         });
